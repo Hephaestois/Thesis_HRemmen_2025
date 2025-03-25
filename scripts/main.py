@@ -1,5 +1,5 @@
-from lib.agents import Walker
-from lib.functions import zipCoords
+from library.agents import Walker
+from library.functions import zipCoords
 import matplotlib.pyplot as plt
 import time
 
