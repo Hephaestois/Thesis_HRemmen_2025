@@ -9,9 +9,11 @@ import time
 #                                    (1M: 1.2s, 2M: 2.3s, 4M: 4.6s) Optimization acquired!
 
 start = time.time()
-walker = Walker()
+
 plt.figure()
-plt.plot(*zipCoords(walker.moveNStep(1000000)), color='red')
+for i in range(500):
+    walker = Walker()
+    plt.plot(*zipCoords(walker.moveNStep(5000)), alpha=0.01, color='red')
 plt.axis('equal')
 plt.axis('square')
 end = time.time()
