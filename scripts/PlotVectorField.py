@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from time import time
@@ -7,10 +8,10 @@ start = time()
 data = pd.read_csv('data/2014-5by6-oneday.csv')
 
 # Extract the necessary columns
-latitude = data['latitude']
-longitude = data['longitude']
-water_u = data['water_u']
-water_v = data['water_v']
+latitude = data['latitude'].to_numpy() #not important now, but later this being numpy will be convenient :)
+longitude = data['longitude'].to_numpy()
+water_u = data['water_u'].to_numpy()
+water_v = data['water_v'].to_numpy()
 
 print(f'Elapsed time after reading data: {time()-start}')
 # Create a plot
