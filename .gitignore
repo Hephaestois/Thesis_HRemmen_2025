@@ -1,5 +1,5 @@
 # custom part: excel data files
-.csv
+*.csv
 
 
 # Byte-compiled / optimized / DLL files
