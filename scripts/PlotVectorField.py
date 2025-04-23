@@ -1,11 +1,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from library.functions import getVectorFieldFromExcel
 from time import time
 
 start = time()
 # Read the CSV file
-data = pd.read_csv('data/2014-5by6-oneday.csv')
+data = getVectorFieldFromExcel('data/2014-5by6-oneday.csv')
 
 # Extract the necessary columns
 latitude = data['latitude'].to_numpy() #not important now, but later this being numpy will be convenient :)

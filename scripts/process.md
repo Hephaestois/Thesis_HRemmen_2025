@@ -30,3 +30,11 @@ http://apdrc.soest.hawaii.edu/erddap/griddap/hawaii_soest_7e38_7a7b_afe2.csv?wat
 This is one day of time, with two depth-scales (0 and 2 meter, my bad). 
 
 Now I just need to implement an actor in a vector field 1. reacting to the vector field and 2. acting in the vector field.
+
+Started trying to interpolate the vectorfield. I dont know yet how to make this vector into a probability, but I'll have the data to do so ready when I do know how to.
+
+
+
+
+
+

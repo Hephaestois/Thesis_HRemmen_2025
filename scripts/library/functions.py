@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 def zipCoords(steps):
     '''A function to convert a list of steps into a list of x and y coordinates for plotting'''
@@ -16,3 +17,13 @@ def chooseDirection(cumProbs, randomNumber):
 
 def directionsFromAngles(angle):
     return np.array([np.cos(angle), np.sin(angle)])
+
+def getVectorFieldFromExcel(filename):
+    #This is currently dependent on deleting line 2 in the CSV. This should be fixed.
+    data = pd.read_csv(f'{filename}')
+    return data
+    
+    
+    
+    
+    
