@@ -1,5 +1,6 @@
-# custom part: excel data files
+# custom part: excel data files and images
 *.csv
+*.png
 
 
 # Byte-compiled / optimized / DLL files
