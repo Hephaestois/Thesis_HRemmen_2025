@@ -13,3 +13,6 @@ def chooseDirection(cumProbs, randomNumber):
         return np.array([0, 1])
     # randomNumber <= cumProbs[3] = 1: always happens
     return np.array([0, -1])
+
+def directionsFromAngles(angle):
+    return np.array([np.cos(angle), np.sin(angle)])
