@@ -6,6 +6,8 @@ To be specific, this file is meant to serve the purpose of me not forgetting wha
 I will therefor add dates as 'waypoints', and also to give a clear separation of time. This will not be readable like a book, I will have to re-format this later into the actual overleaf text. 
 
 # April 23-04
+FOR VIKTORIA: Found sources, started vectorfield implementation.
+
 In the meeting today, we discussed which direction to take the project: I have suggested continuing the turtles-thing from Painter, Hillen. Topgether we arrived to 1. a more overseeable scope and 2. a semi-detailed timeline. To reiterate, the timeline is going to be roughly: 
 - implement FAAD
 - implement the RW with non-constant a and D
@@ -34,6 +36,8 @@ Now I just need to implement an actor in a vector field 1. reacting to the vecto
 Started trying to interpolate the vectorfield. I dont know yet how to make this vector into a probability, but I'll have the data to do so ready when I do know how to.
 
 # April 24-04
+FOR VIKTORIA: play around with RRWinVF. Don't go too crazy with the N_swims and swim_length, maybe keep their product under 50.000, execution time ~1minute?. (Repeated Random walk in Vector Field)
+
 Today I managed to implement the turtle floating in a vectorfield. I have not used interpolation, but instead just assume the value of the closest gridpoint that has a vector value. For a fine enough grid, this should be doable. It is not possible to precompute these values due to vectorfield being a dataframe, but the speedup probably wouldn't be huge. Performance gains can be had here, though.
 
 The implementation works as follows: Put a turtle in a stream, make sure you DO NOT GET LAT/LON MIXED UP (lon corr. to x, lat to y). Then using numpy find the closest gridpoint to a location. Now assign probabilities to moving lrud so that they sum to one and point in the direction of the vector field.
@@ -41,7 +45,11 @@ The implementation works as follows: Put a turtle in a stream, make sure you DO 
 This is of course not taking into account the swimming behaviour of the turtles. I have considered this to be postponed right now, but it should be not a lot harder than just choosing two weights and modifying their behaviour by those weights. I am now going to turn my attention towards the repeated swim simulation of the turtles, to see a density arise.
 
 I have implemented the repeated 'float', a RW with only vector field influence.
+I have now also implemented the repeated 'swim', a RW with influence from the turtles and the field. To combine the influence from the turtles and the field, I have created weights to average the static and dynamic probabilities of movement.
 
+I think I will now (have to) start to approach the PDE based solution. Because I am not looking very forward to doing this (how tf do I incorporate the vector field into FEniCS?!?), I will instead start with expanding the text in the overleaf. Maybe later today I will also try to implement the time-varying vector field, but I don't think its feasible to acquire my data on this wifi network. Or I will do some by-hand math on existence and stuff that into the overleaf. Yay.
 
+I would also like to try to optimize the simulation of the turtles. Currently the program is using just one thread, but it would be ideal if each turtle could be simulated by one thread, to a total of 16 threads on my laptop and home computer tower. Later this could be increased to allow supercomputing??! :D
+ 
 
 
