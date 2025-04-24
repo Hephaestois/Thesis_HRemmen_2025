@@ -17,7 +17,7 @@ In the meeting today, we discussed which direction to take the project: I have s
 
 The first dataset I want to get, I want
 With range: 2018-01-01 -- 2018-01-04,
-Lat-Lon: 42-47 N, 331-349 E (as in KJP) (or -29 to -11 E)
+Lat(y)-Lon(x): 42-47 N, 331-349 E (as in KJP, approximately) (or -29 to -11 E)
 
 After 3 failed attempts,
 http://apdrc.soest.hawaii.edu/erddap/griddap/hawaii_soest_7e38_7a7b_afe2.html

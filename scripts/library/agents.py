@@ -1,4 +1,4 @@
-from library.functions import chooseDirection, directionsFromAngles
+from library.functions import chooseDirection, directionsFromAngles, findClosestIndex
 import numpy as np
 
 class Grid:
@@ -59,31 +59,27 @@ class Walker:
         return positions
     
     def getRWBiasInField(self, vectorfield):
-        lat = self.position[0]
-        lon = self.position[1]
-
+        lon = self.position[0]
+        lat = self.position[1]
+        
         # TODO: This function is horribly broken! 
         # This will always return the FIRST instance of the specific lat/lon being found. \
         # Not the actual idx being searched.
         
-        
-        closest_lon_idx = (np.abs(vectorfield['longitude'] - lon)).argmin()
-        closest_lat_idx = (np.abs(vectorfield['latitude'] - lat)).argmin()
-
-
-
+        closest_idx = findClosestIndex(vectorfield, lat, lon)
         # x' = x / (x+y), y' = y / (x+y), 
         # so that x'+y'=1 making it a feasible 
         # (unscaled!) prob.
         # Problem is that movement is always along vec field.
         # Negativity of field velocity is handled with logic instead math.
         
-        horizontal_field_velocity = vectorfield['latitude'][closest_lat_idx]
-        vertical_field_velocity = vectorfield['longitude'][closest_lon_idx]
+        horizontal_field_velocity = vectorfield['water_u'][closest_idx]
+        vertical_field_velocity = vectorfield['water_v'][closest_idx]
         total_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
         
         horiz_prob = np.abs(horizontal_field_velocity)/total_velocity
         vert_prob = np.abs(vertical_field_velocity)/total_velocity
+        
         
         #now these probabilities add up to 1.
         if horizontal_field_velocity >= 0:
@@ -97,7 +93,6 @@ class Walker:
             else:
                 self.probs = np.array([horiz_prob, 0, 0, vert_prob])
         self.cumProbs = np.cumsum(self.probs)
-        
 
     def directionToStep(self, direction):
         #Makes a step move on a grid. 

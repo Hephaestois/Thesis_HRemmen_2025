@@ -24,6 +24,12 @@ def getVectorFieldFromExcel(filename):
     return data
     
     
+def findClosestIndex(vectorfield, lat, lon): 
+    latts = np.power(vectorfield['latitude']-lat, 2)
+    longs = np.power(vectorfield['longitude']-lon, 2)
+    distance = np.sqrt(latts+longs)
+    index = np.argmin(distance)
+    return index
     
     
     
