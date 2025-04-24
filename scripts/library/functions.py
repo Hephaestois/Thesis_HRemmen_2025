@@ -23,7 +23,6 @@ def getVectorFieldFromExcel(filename):
     data = pd.read_csv(f'{filename}')
     return data
     
-    
 def findClosestIndex(vectorfield, lat, lon): 
     latts = np.power(vectorfield['latitude']-lat, 2)
     longs = np.power(vectorfield['longitude']-lon, 2)

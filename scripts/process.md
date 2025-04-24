@@ -5,7 +5,7 @@ To be specific, this file is meant to serve the purpose of me not forgetting wha
 
 I will therefor add dates as 'waypoints', and also to give a clear separation of time. This will not be readable like a book, I will have to re-format this later into the actual overleaf text. 
 
-# 23-04
+# April 23-04
 In the meeting today, we discussed which direction to take the project: I have suggested continuing the turtles-thing from Painter, Hillen. Topgether we arrived to 1. a more overseeable scope and 2. a semi-detailed timeline. To reiterate, the timeline is going to be roughly: 
 - implement FAAD
 - implement the RW with non-constant a and D
@@ -33,7 +33,14 @@ Now I just need to implement an actor in a vector field 1. reacting to the vecto
 
 Started trying to interpolate the vectorfield. I dont know yet how to make this vector into a probability, but I'll have the data to do so ready when I do know how to.
 
+# April 24-04
+Today I managed to implement the turtle floating in a vectorfield. I have not used interpolation, but instead just assume the value of the closest gridpoint that has a vector value. For a fine enough grid, this should be doable. It is not possible to precompute these values due to vectorfield being a dataframe, but the speedup probably wouldn't be huge. Performance gains can be had here, though.
 
+The implementation works as follows: Put a turtle in a stream, make sure you DO NOT GET LAT/LON MIXED UP (lon corr. to x, lat to y). Then using numpy find the closest gridpoint to a location. Now assign probabilities to moving lrud so that they sum to one and point in the direction of the vector field.
+
+This is of course not taking into account the swimming behaviour of the turtles. I have considered this to be postponed right now, but it should be not a lot harder than just choosing two weights and modifying their behaviour by those weights. I am now going to turn my attention towards the repeated swim simulation of the turtles, to see a density arise.
+
+I have implemented the repeated 'float', a RW with only vector field influence.
 
 
 

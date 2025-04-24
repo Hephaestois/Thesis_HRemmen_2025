@@ -13,12 +13,14 @@ class Walker:
             probs=(0.25, 0.25, 0.25, 0.25), 
             orientationFunction=lambda x: 0, 
             horizontalStepSize=1, verticalStepSize=1, 
+            weight_self=0.5, weight_VF=0.5
                 ):
         
         self.position = np.array(init_position)   # The coordinate where our walker is
         
-        
         # related to position jump process
+        self.initProbs = np.array(probs)
+        self.initCumProbs = np.cumsum(self.initProbs)
         self.probs = np.array(probs)              # probability of moving l, r, u, d.
         self.cumProbs = np.cumsum(self.probs)
         
@@ -28,9 +30,13 @@ class Walker:
         # Related to vector field dynamics
         self.horizontalStepSize = horizontalStepSize
         self.verticalStepSize = verticalStepSize
+        self.weight_self = weight_self
+        self.weight_VF = weight_VF
+        
         
     def moveRandom(self, randomnum):
-        direction = self.directionToStep(chooseDirection(self.cumProbs, randomnum)) #This is a coordinate, unit direction.
+        weightedCumProbs = self.initCumProbs*self.weight_self + self.cumProbs*self.weight_VF
+        direction = self.directionToStep(chooseDirection(weightedCumProbs, randomnum)) #This is a coordinate, unit direction.
         self.position += direction
         return self.position #Might be useful later?
     
@@ -100,16 +106,6 @@ class Walker:
     
     def traverseVectorField(self, vectorfield, n):
         # # Precompute random directions for all steps
-        # directions = np.array([self.directionToStep(chooseDirection(self.cumProbs, randomNumbers[i])) for i in range(n)])
-        
-        # # Calculate all positions in parallel
-        # positions = np.cumsum(directions, axis=0) + self.position
-
-        # # Update the final position
-        # self.position = positions[-1]
-
-        # return positions
-        
         randomNumbers = np.random.rand(n)
         positions = np.zeros([n+1,2])
         positions[0]=self.position
@@ -118,7 +114,26 @@ class Walker:
             self.getRWBiasInField(vectorfield)
             newpos = self.moveRandom(randomNumbers[i])
             positions[i+1] = newpos
+            if self.exceeds(vectorfield):
+                positions = positions[0:i+1, 0:2]
+                break
         
         self.position = positions[-1]
         
         return positions
+    
+    def exceeds(self, vectorfield):
+        lon = self.position[0]
+        lat = self.position[1]
+        
+        
+        if np.all(np.greater(lat,vectorfield['latitude'])):
+            return True
+        if np.all(np.less(lat, vectorfield['latitude'])):
+            return True
+        if np.all(np.greater(lon,vectorfield['longitude'])):
+            return True
+        if np.all(np.less(lon, vectorfield['longitude'])):
+            return True
+        
+        return False
