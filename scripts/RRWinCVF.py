@@ -1,7 +1,6 @@
 from library.agents import Walker
 from library.functions import zipCoords, getVectorFieldFromExcel
 import matplotlib.pyplot as plt
-import matplotlib
 import time
 import pandas as pd
 import numpy as np
@@ -9,8 +8,8 @@ import numpy as np
 
 ### Simulation options
 # High level stuff
-N_swims = 100
-swim_length = 600
+N_swims = 40
+swim_length = 200
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
@@ -22,7 +21,7 @@ verticalStepSize = 0.05   # Turtle step size
 
 
 ### Plotting options
-walk_opacity = 0.05
+walk_opacity = 0.2
 
 
 ###
@@ -41,16 +40,20 @@ for i in range(N_swims):
     Tutel = Walker(
         init_position=startpos,
         probs = initial_probability,
-        horizontalStepSize=horizontalStepSize, verticalStepSize=verticalStepSize,
-        weight_self = weight_self, weight_VF = weight_VF 
+        horizontalStepSize=horizontalStepSize, 
+        verticalStepSize=verticalStepSize,
+        weight_self = weight_self, 
+        weight_VF = weight_VF 
         )
-    locations = Tutel.traverseVectorField(vectorfield, 6*i) #swim_length
+    locations = Tutel.traverseVectorField(vectorfield, swim_length) #swim_length
     plotvals = zipCoords(locations)
     points.append([plotvals[0][-1], plotvals[1][-1]])
+    
     if walk_opacity == 0:
         continue
-    for i in range(len(plotvals[0])-1):
-        plt.plot(plotvals[0][i:i+2], plotvals[1][i:i+2], color='red', alpha=walk_opacity)
+    
+    for j in range(len(plotvals[0])-1):
+        plt.plot(plotvals[0][j:j+2], plotvals[1][j:j+2], color='red', alpha=walk_opacity)
     
 plt.scatter(zipCoords(points)[0], zipCoords(points)[1], color='g', marker='.', zorder=10)        
 plt.plot(startpos[0], startpos[1], color="k", marker='.')

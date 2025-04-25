@@ -10,7 +10,7 @@ class Walker:
     def __init__(
             self, 
             init_position=np.array([0, 0]), 
-            probs=(0.25, 0.25, 0.25, 0.25), 
+            init_probs=(0.25, 0.25, 0.25, 0.25), 
             orientationFunction=lambda x: 0, 
             horizontalStepSize=1, verticalStepSize=1, 
             weight_self=0.5, weight_VF=0.5
@@ -19,9 +19,9 @@ class Walker:
         self.position = np.array(init_position)   # The coordinate where our walker is
         
         # related to position jump process
-        self.initProbs = np.array(probs)
+        self.initProbs = np.array(init_probs)
         self.initCumProbs = np.cumsum(self.initProbs)
-        self.probs = np.array(probs)              # probability of moving l, r, u, d.
+        self.probs = np.array(init_probs)              # probability of moving l, r, u, d.
         self.cumProbs = np.cumsum(self.probs)
         
         # related to velocity jump process

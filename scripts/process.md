@@ -51,5 +51,41 @@ I think I will now (have to) start to approach the PDE based solution. Because I
 
 I would also like to try to optimize the simulation of the turtles. Currently the program is using just one thread, but it would be ideal if each turtle could be simulated by one thread, to a total of 16 threads on my laptop and home computer tower. Later this could be increased to allow supercomputing??! :D
  
+Options to approach in work right now:
+- Document developing the model
+- Implement time-dependence
+- Do hand-derivation for specific model
+- Multithread my process 
+
+# April 25-04 
+I found a better place to get my data from. 
+(Specific website): https://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3.html
+(General collection of data): https://tds.hycom.org/thredds/catalog.html
+
+To get the data for the entire year 2015, I am using the following:
+https://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3?lat[2050:1:2175],lon[1885:1:2111],time[1452:4:4388],water_u[1452:4:4388][0:1:0][2050:1:2175][1885:1:2111],water_v[1452:4:4388][0:1:0][2050:1:2175][1885:1:2111]
+I should note! The time misses a few moments. because it is sampled on 3-hour intervals, this means that specifying 8x3 hour jumps sometimes results in 27-hour days. To omit this issue, I have specified 4x3 hour jumps in the time, so that I can sample, for each moment of 24 hours, the most recent datapoint in the past 24 hours. This is generally going to be unique, and as these are ocean streams, I find that good enough.
+
+The format of the data calls for some functions to preprocess it. I think I will write these today. I wanted to adapt the vectorfield to not be a dataframe anyway, so that I have the option to vectorize some operations. I also think I want to preprocess the possible distances between points. This is to say, for determining which vector to take influence from, I am currently just using a distance calculation based on euclidian distance, for the location of the swimmer to every single datapoint. This was due to format restrictions, and being lazy. The format of the new data would hopefully allow for a more efficient approach, where I slice the dataset based on the location of the swimmen, turning an O(n^2) into a O(n log n) operation with a little luck
+
+My download of the data from the above mentioned source has finished. I intend first to get the data into python (the extension is .dods... what does this mean? How do I use it?), then to make the PLT quiver of one day, and then to make a PLT animation (gif) of each successive day. To get a feel for how the vector field changes, and to see if the stream is comparable to the one in KJP for +100 days, +200 days, +300 days.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

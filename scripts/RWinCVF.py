@@ -1,7 +1,6 @@
 from library.agents import Walker
 from library.functions import zipCoords, getVectorFieldFromExcel
 import matplotlib.pyplot as plt
-import matplotlib
 import time
 import pandas as pd
 import numpy as np
