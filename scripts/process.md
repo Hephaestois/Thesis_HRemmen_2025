@@ -70,6 +70,12 @@ The format of the data calls for some functions to preprocess it. I think I will
 
 My download of the data from the above mentioned source has finished. I intend first to get the data into python (the extension is .dods... what does this mean? How do I use it?), then to make the PLT quiver of one day, and then to make a PLT animation (gif) of each successive day. To get a feel for how the vector field changes, and to see if the stream is comparable to the one in KJP for +100 days, +200 days, +300 days.
 
+The data I acquired is the ocean stream data, dates 01-01-2015 - 01-01-2016, 42-47N (0.04), -29--11E (0.08), in 12 hour intervals. The total data volume appears to be about 160MB. To read this data, I am installing pydap (as per google search).
+Time to make a new python file, plotVF.
+
+To access the data, I am using netCDF4. Using pydap (my first attempt) had an issue where it would just change the link. So now netCDF4 is the solution. I am a little affraid of data traffic speed, but I suppose I'll find out.
+
+The data has been accessed. I have created a beautiful video ocean_currents_animation.mp4. It shows the ocean currents starting from 01-01-2014 for 60*3 hours, for a total of 7.5 days. I have also created an image of the vectorfield comparable to KJP, at 01-01-2014+200 days, which is at time-index 146 or time value 127536 (hours from 01-01-2001). These look comparable, so I am going forward with the trust that my method of acquiring a vector field is at least somewhat correct. 
 
 
 
