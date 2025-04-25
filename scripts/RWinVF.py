@@ -7,16 +7,16 @@ import netCDF4
 
 ### Simulation options
 # High level stuff
-N_simulation_steps = 50
-N_tutels = 20
+N_simulation_steps = 100
+N_tutels = 300
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
-weight_self = 0.5 # Contribution due to own movement
-weight_VF = 0.5   # Contribution due to vector field
-horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
-verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
+weight_self = 0 # Contribution due to own movement
+weight_VF = 1   # Contribution due to vector field
+horizontalStepSize = 0.2 # Turtle step size, in degrees lat/long
+verticalStepSize = 0.2   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
 startTime = 131496 #01-01-2015
@@ -31,7 +31,7 @@ latitude_data_stepsize  = 8 #Multiples of 0.08 degree
 delta = 8                   #For correcting size mismatch
 
 ### Plotting options
-walk_opacity = 1
+walk_opacity = 0.02
 
 
 ### END of options
@@ -84,9 +84,10 @@ for t in simulationTimes:
         paths[j].append(Tutels[j].traverseContVectorField(vectorfield, n=1))
         print(f'Turtle {j} moved at timestep {np.round((simulationTimeIndex-startTimeIndex)/8)}')
 
+plt.figure(dpi=600)
+
 for locations in paths:
     plotvals = zipCoords(locations)
-    plt.figure(dpi=600)
     for i in range(len(plotvals[0])-1):
         plt.plot(plotvals[0][i:i+2], plotvals[1][i:i+2], color='red', alpha=walk_opacity)
     
