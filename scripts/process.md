@@ -77,7 +77,14 @@ To access the data, I am using netCDF4. Using pydap (my first attempt) had an is
 
 The data has been accessed. I have created a beautiful video ocean_currents_animation.mp4. It shows the ocean currents starting from 01-01-2014 for 60*3 hours, for a total of 7.5 days. I have also created an image of the vectorfield comparable to KJP, at 01-01-2014+200 days, which is at time-index 146 or time value 127536 (hours from 01-01-2001). These look comparable, so I am going forward with the trust that my method of acquiring a vector field is at least somewhat correct. 
 
+## Making the random walk in a vector field (that is NOT time constant)
 
+The dataset I acquired starts on 01-Jul-2014, which has time value 127092. To make a random walk in a non-constant vector field, I need to start at this time, and then increment by 24 hours when the conditions to do this are met. Because I am doing a Position jump-process, I should probably not increase the time-step every simulation-step. I will include a variable to account for this, probably dependent on the turtles step size. For now, I will just let this variable default to one. 
+
+Another issue is that not every datapoint in the dataset is accounted for. They didn't do NaN, meaning that the 'timeline' is not pretty. That is to say, importing all the time values in the dataset results, not all intervals between datapoints are 3 hours! This is a problem, as I want to do a simulation step every 24, and thus can not just count 8 indices.
+To alleviate this issue, I am going to count the hours since start (with integer 24-amounts). Then, if it turns out that this multiple of 24 is not in the dataset, I will use the most recent 3-hour multiple that _is_ in the dataset. Doing this, I still have control over the 'flow' of time in my simulation. I hope that the effect of 3 hours is not too severe (allthough maybe the tide makes it so that I should just use the previous days' stream), but it is worth it to investigate the effect of a different choice for this. Damn incomplete datasets!
+
+Because I foresee that downloading data is a significant bottleneck in my project, I am goign to also approach simulating the turtles differently. Previously, there used to be one turtle that would do a walk in a constant vector field. This was fine, because there was no functional difference between having one turtle do 600 walks, or 600 turtles doing one walk. Now, however, if I have one turtle doing 600 walks, I need to cycle through the time range 600 times, whereas if 600 turtles do one walk step by step, I need only cycle through the range 1 time. So this 'reversed' approach is how I will implement the new functions, handling a time-non-constant field.
 
 
 

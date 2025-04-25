@@ -21,6 +21,8 @@ lons = dataset.variables['lon'][lons_idx]
 #times = dataset.variables['time'][:]
 time_plot_idx = 0 #Variable between 0, 4388. Notable 146 is 01-01-2014 + 200days (see KJP)
 
+print(dataset.variables['time'][0])
+
 # Print a subset of the data
 water_u = dataset.variables['water_u'][time_plot_idx, 0, lats_idx, lons_idx]
 water_v = dataset.variables['water_v'][time_plot_idx, 0, lats_idx, lons_idx]

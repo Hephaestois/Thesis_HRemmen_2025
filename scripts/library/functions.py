@@ -29,6 +29,11 @@ def findClosestIndex(vectorfield, lat, lon):
     distance = np.sqrt(latts+longs)
     index = np.argmin(distance)
     return index
+
+def findClosestIndexCont(vectorfield, lat, lon):
+    closestLatIdx = np.argmin(vectorfield['latitude']-lat)
+    closestLonIdx = np.argmin(vectorfield['longitude']-lon)
+    return closestLatIdx, closestLonIdx
     
     
     

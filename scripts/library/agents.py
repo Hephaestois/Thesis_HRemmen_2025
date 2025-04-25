@@ -1,4 +1,4 @@
-from library.functions import chooseDirection, directionsFromAngles, findClosestIndex
+from library.functions import chooseDirection, directionsFromAngles, findClosestIndex, findClosestIndexCont
 import numpy as np
 
 class Grid:
@@ -99,6 +99,42 @@ class Walker:
             else:
                 self.probs = np.array([horiz_prob, 0, 0, vert_prob])
         self.cumProbs = np.cumsum(self.probs)
+        
+    def getRWBiasInContField(self, vectorfield):
+        lon = self.position[0]
+        lat = self.position[1]
+        
+        # TODO: This function is horribly broken! 
+        # This will always return the FIRST instance of the specific lat/lon being found. \
+        # Not the actual idx being searched.
+        
+        closest_idx = findClosestIndexCont(vectorfield, lat, lon)
+        # x' = x / (x+y), y' = y / (x+y), 
+        # so that x'+y'=1 making it a feasible 
+        # (unscaled!) prob.
+        # Problem is that movement is always along vec field.
+        # Negativity of field velocity is handled with logic instead math.
+        
+        horizontal_field_velocity = vectorfield['water_u'][closest_idx]
+        vertical_field_velocity = vectorfield['water_v'][closest_idx]
+        total_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
+        
+        horiz_prob = np.abs(horizontal_field_velocity)/total_velocity
+        vert_prob = np.abs(vertical_field_velocity)/total_velocity
+        
+        
+        #now these probabilities add up to 1.
+        if horizontal_field_velocity >= 0:
+            if vertical_field_velocity >= 0:
+                self.probs = np.array([0, horiz_prob, vert_prob, 0]) # probability of moving l, r, u, d.
+            else:
+                self.probs = np.array([0, horiz_prob, 0, vert_prob])
+        else:
+            if vertical_field_velocity >= 0:
+                self.probs = np.array([horiz_prob, 0, vert_prob, 0])
+            else:
+                self.probs = np.array([horiz_prob, 0, 0, vert_prob])
+        self.cumProbs = np.cumsum(self.probs)
 
     def directionToStep(self, direction):
         #Makes a step move on a grid. 
@@ -112,6 +148,23 @@ class Walker:
         for i in range(n):
             #This automatically updates the directions
             self.getRWBiasInField(vectorfield)
+            newpos = self.moveRandom(randomNumbers[i])
+            positions[i+1] = newpos
+            if self.exceeds(vectorfield):
+                positions = positions[0:i+1, 0:2]
+                break
+        
+        self.position = positions[-1]
+        
+        return positions
+    
+    def traverseContVectorField(self,vectorfield,n):
+        randomNumbers = np.random.rand(n)
+        positions = np.zeros([n+1,2])
+        positions[0]=self.position
+        for i in range(n):
+            #This automatically updates the directions
+            self.getRWBiasInContField(vectorfield)
             newpos = self.moveRandom(randomNumbers[i])
             positions[i+1] = newpos
             if self.exceeds(vectorfield):
