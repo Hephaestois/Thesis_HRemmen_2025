@@ -68,10 +68,6 @@ class Walker:
         lon = self.position[0]
         lat = self.position[1]
         
-        # TODO: This function is horribly broken! 
-        # This will always return the FIRST instance of the specific lat/lon being found. \
-        # Not the actual idx being searched.
-        
         closest_idx = findClosestIndex(vectorfield, lat, lon)
         # x' = x / (x+y), y' = y / (x+y), 
         # so that x'+y'=1 making it a feasible 
@@ -104,26 +100,15 @@ class Walker:
         lon = self.position[0]
         lat = self.position[1]
         
-        # TODO: This function is horribly broken! 
-        # This will always return the FIRST instance of the specific lat/lon being found. \
-        # Not the actual idx being searched.
-        
         closest_idx = findClosestIndexCont(vectorfield, lat, lon)
-        # x' = x / (x+y), y' = y / (x+y), 
-        # so that x'+y'=1 making it a feasible 
-        # (unscaled!) prob.
-        # Problem is that movement is always along vec field.
-        # Negativity of field velocity is handled with logic instead math.
-        
         horizontal_field_velocity = vectorfield['water_u'][closest_idx]
         vertical_field_velocity = vectorfield['water_v'][closest_idx]
+        # Normalization trick
         total_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
-        
         horiz_prob = np.abs(horizontal_field_velocity)/total_velocity
         vert_prob = np.abs(vertical_field_velocity)/total_velocity
+        # Now these probabilities add up to 1.
         
-        
-        #now these probabilities add up to 1.
         if horizontal_field_velocity >= 0:
             if vertical_field_velocity >= 0:
                 self.probs = np.array([0, horiz_prob, vert_prob, 0]) # probability of moving l, r, u, d.
@@ -159,6 +144,9 @@ class Walker:
         return positions
     
     def traverseContVectorField(self,vectorfield,n):
+        if self.exceeds(vectorfield):
+            return
+
         randomNumbers = np.random.rand(n)
         positions = np.zeros([n+1,2])
         positions[0]=self.position
@@ -172,13 +160,11 @@ class Walker:
                 break
         
         self.position = positions[-1]
-        
         return positions
     
     def exceeds(self, vectorfield):
         lon = self.position[0]
         lat = self.position[1]
-        
         
         if np.all(np.greater(lat,vectorfield['latitude'])):
             return True
@@ -188,5 +174,4 @@ class Walker:
             return True
         if np.all(np.less(lon, vectorfield['longitude'])):
             return True
-        
         return False

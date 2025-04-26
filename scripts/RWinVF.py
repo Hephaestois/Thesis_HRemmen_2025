@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 import time
 import numpy as np
 import netCDF4
+import pickle
 
 ### Simulation options
 # High level stuff
-N_simulation_steps = 100
+N_simulation_steps = 600 #dont go beyond 638 fr fr, exceeds dataset bound
 N_tutels = 300
 
 # Turtle related stuff
@@ -31,7 +32,7 @@ latitude_data_stepsize  = 8 #Multiples of 0.08 degree
 delta = 8                   #For correcting size mismatch
 
 ### Plotting options
-walk_opacity = 0.02
+walk_opacity = 0.015
 
 
 ### END of options
@@ -55,7 +56,6 @@ vectorfield = dict()
 vectorfield['latitude'] = latitudes
 vectorfield['longitude'] = longitudes
 
-
 Tutels = []
 paths = []
 
@@ -72,7 +72,7 @@ for _ in range(N_tutels):
     paths.append([])
 
 
-for t in simulationTimes:
+for simstep, t in enumerate(simulationTimes):
     # Searchsorted find the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
     simulationTimeIndex = np.searchsorted(times, t)+startTimeIndex
@@ -81,19 +81,15 @@ for t in simulationTimes:
     vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]
     
     for j in range(N_tutels):
-        paths[j].append(Tutels[j].traverseContVectorField(vectorfield, n=1))
-        print(f'Turtle {j} moved at timestep {np.round((simulationTimeIndex-startTimeIndex)/8)}')
+        Tutels[j].traverseContVectorField(vectorfield, n=1)
+        # print("MAIN Positions:\n", positions)
+        paths[j].append(Tutels[j].position)
+        # print("MAIN New path:\n", paths[j])
+        print(f'Turtle {j} moved at timestep {simstep}')
 
-plt.figure(dpi=600)
-
-for locations in paths:
-    plotvals = zipCoords(locations)
-    for i in range(len(plotvals[0])-1):
-        plt.plot(plotvals[0][i:i+2], plotvals[1][i:i+2], color='red', alpha=walk_opacity)
-    
-#plt.plot(paths[0][0][0], paths[0][1][0], color="k", marker='.')
-
+# Save the data so we can do graphical stuff on it.
+with open('createdData.pkl', 'wb') as file:
+    pickle.dump(paths, file)
 
 end = time.time()
 print(f"{1000 * (end - start)} milliseconds elapsed")
-plt.savefig('randomWalk.png')

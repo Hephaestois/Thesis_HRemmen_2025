@@ -13,7 +13,7 @@ dataset = netCDF4.Dataset(url)
 # Index ranges
 lats_idx = range(2050, 2176, 2)
 lons_idx = range(1885, 2113, 2)
-time_idx = range(0, 60, 1)
+time_idx = range(1452, 4388, 16)
 #time_idx = range(1452, 4388, 4)
 
 # Get coordinate grids

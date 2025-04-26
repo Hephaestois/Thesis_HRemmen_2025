@@ -3,7 +3,7 @@ import pandas as pd
 
 def zipCoords(steps):
     '''A function to convert a list of steps into a list of x and y coordinates for plotting'''
-    return np.array(steps).T
+    return np.transpose(np.array(steps))
 
 def chooseDirection(cumProbs, randomNumber):
     if randomNumber <= cumProbs[0]:
@@ -33,7 +33,7 @@ def findClosestIndex(vectorfield, lat, lon):
 def findClosestIndexCont(vectorfield, lat, lon):
     closestLatIdx = np.argmin(vectorfield['latitude']-lat)
     closestLonIdx = np.argmin(vectorfield['longitude']-lon)
-    return closestLatIdx, closestLonIdx
+    return closestLonIdx, closestLatIdx
     
     
     
