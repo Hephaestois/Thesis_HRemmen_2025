@@ -1,6 +1,6 @@
-# custom part: excel data files and images
+# custom part: excel data files and pickled files. Images should be removed manually time-to-time.
 *.csv
-*.png
+#*.png
 *.pkl
 
 # Byte-compiled / optimized / DLL files

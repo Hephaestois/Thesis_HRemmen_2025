@@ -14,8 +14,8 @@ swim_length = 200
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
-weight_self = 0.5 # Contribution due to own movement
-weight_VF = 0.5   # Contribution due to vector field
+weight_self = 0 # Contribution due to own movement
+weight_VF = 1   # Contribution due to vector field
 horizontalStepSize = 0.05 # Turtle step size
 verticalStepSize = 0.05   # Turtle step size
 
@@ -39,7 +39,7 @@ points = []
 for i in range(N_swims):
     Tutel = Walker(
         init_position=startpos,
-        probs = initial_probability,
+        init_probs = initial_probability,
         horizontalStepSize=horizontalStepSize, 
         verticalStepSize=verticalStepSize,
         weight_self = weight_self, 

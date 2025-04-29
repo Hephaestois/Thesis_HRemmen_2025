@@ -8,16 +8,16 @@ import pickle
 
 ### Simulation options
 # High level stuff
-N_simulation_steps = 600 #dont go beyond 638 fr fr, exceeds dataset bound
-N_tutels = 300
+N_tutels = 40
+N_simulation_steps = 200 #dont go beyond 638 fr fr, exceeds dataset bound
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
 weight_self = 0 # Contribution due to own movement
 weight_VF = 1   # Contribution due to vector field
-horizontalStepSize = 0.2 # Turtle step size, in degrees lat/long
-verticalStepSize = 0.2   # Turtle step size, in degrees lat/long
+horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
+verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
 startTime = 131496 #01-01-2015
@@ -32,7 +32,7 @@ latitude_data_stepsize  = 8 #Multiples of 0.08 degree
 delta = 8                   #For correcting size mismatch
 
 ### Plotting options
-walk_opacity = 0.015
+walk_opacity = 0.2
 
 
 ### END of options
