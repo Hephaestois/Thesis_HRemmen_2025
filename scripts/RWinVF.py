@@ -14,8 +14,8 @@ N_simulation_steps = 200 #dont go beyond 638 fr fr, exceeds dataset bound
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
-weight_self = 0 # Contribution due to own movement
-weight_VF = 1   # Contribution due to vector field
+weight_self = 0.5 # Contribution due to own movement
+weight_VF = 0.5   # Contribution due to vector field
 horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
 
