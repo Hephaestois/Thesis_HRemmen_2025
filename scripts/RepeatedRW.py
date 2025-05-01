@@ -12,11 +12,15 @@ import time
 start = time.time()
 
 plt.figure()
+
 for i in range(500):
-    walker = Walker()
-    plt.plot(*zipCoords(walker.moveNStep(5000)), alpha=0.01, color='red')
+    walker = Walker(weight_self=1, weight_VF=0)
+    plt.plot(*zipCoords(walker.positionJumpProcess(1000)), alpha=0.01, color='red')
+
 plt.axis('equal')
 plt.axis('square')
 end = time.time()
 print(f"{1000 * (end - start)} milliseconds elapsed")
+
+plt.savefig('RRW_sample')
 plt.show()

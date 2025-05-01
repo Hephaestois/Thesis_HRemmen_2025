@@ -18,7 +18,7 @@ start = time.time()
 
 walker = Walker(orientationFunction=lambda x: x*2*3.1415)
 plt.figure(figsize=(4,4),dpi=600)
-locations = walker.positionJumpProcess(30)
+locations = walker.positionJumpProcess(20000)
 plotvals = zipCoords(locations)
 # print(locations)
 
