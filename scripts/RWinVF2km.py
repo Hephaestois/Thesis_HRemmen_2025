@@ -9,7 +9,8 @@ import pickle
 ### Simulation options
 # High level stuff
 N_tutels = 40
-N_simulation_steps = 200 #dont go beyond 638 fr fr, exceeds dataset bound
+N_simulation_steps = 300 #dont go beyond 638 fr fr, exceeds dataset bound
+N_steps_per_timestep = 5
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
@@ -46,8 +47,8 @@ lats_idx = range(2050,2176-delta,latitude_data_stepsize)
 
 
 # These three are pretty important, as they are used to precompute some stuff, best saved locally
-longitudes = dataset.variables['lon'][lons_idx]
-latitudes = dataset.variables['lat'][lats_idx]
+longitudes = dataset.variables['lon'][lons_idx] # Range -29.2, -11.28
+latitudes = dataset.variables['lat'][lats_idx]  # Range 42.0, 46.48
 times = [j for j in [i for i in dataset.variables['time'][:] if i >= startTime] if j <= endTime]
 simulationTimes = list(range(startTime, endTime, 24))
 startTimeIndex = list(dataset.variables['time'][:]).index(startTime)
@@ -71,21 +72,33 @@ for _ in range(N_tutels):
     Tutels.append(tutel)
     paths.append([])
 
-
+done = 0
 for simstep, t in enumerate(simulationTimes):
     # Searchsorted find the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
     simulationTimeIndex = np.searchsorted(times, t)+startTimeIndex
-    
+    print(simstep)    
     vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]
     vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]
     
     for j in range(N_tutels):
-        Tutels[j].traverseContVectorField(vectorfield, n=1)
-        # print("MAIN Positions:\n", positions)
-        paths[j].append(Tutels[j].position)
-        # print("MAIN New path:\n", paths[j])
-        print(f'Turtle {j} moved at timestep {simstep}')
+        if done > N_tutels*N_steps_per_timestep: 
+            break
+            
+        for _ in range(N_steps_per_timestep):
+            if Tutels[j].finished:
+                done += 1
+                print(f'Skipped turtle {j} at timestep {simstep}')
+                continue
+            
+            done = 0
+            Tutels[j].traverseContVectorField(vectorfield, n=1)
+            paths[j].append(Tutels[j].position)
+    
+    if done > N_tutels*N_steps_per_timestep:
+        print(f'Exited at simstep {simstep} as all turtles were done.')
+        break
+    
 
 # Save the data so we can do graphical stuff on it.
 with open('createdData.pkl', 'wb') as file:

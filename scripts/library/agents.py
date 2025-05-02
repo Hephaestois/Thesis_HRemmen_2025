@@ -33,6 +33,9 @@ class Walker:
         self.weight_self = weight_self
         self.weight_VF = weight_VF
         
+        #Has the turtle hit a border?
+        self.finished = False
+        
         
     def moveRandom(self, randomnum):
         weightedCumProbs = self.initCumProbs*self.weight_self + self.cumProbs*self.weight_VF
@@ -144,9 +147,8 @@ class Walker:
         return positions
     
     def traverseContVectorField(self,vectorfield,n):
-        if self.exceeds(vectorfield):
-            return
-
+        self.exceeds(vectorfield)
+        
         randomNumbers = np.random.rand(n)
         positions = np.zeros([n+1,2])
         positions[0]=self.position
@@ -163,15 +165,17 @@ class Walker:
         return positions
     
     def exceeds(self, vectorfield):
+        self.finished = True
         lon = self.position[0]
         lat = self.position[1]
         
         if np.all(np.greater(lat,vectorfield['latitude'])):
-            return True
+            return
         if np.all(np.less(lat, vectorfield['latitude'])):
-            return True
+            return
         if np.all(np.greater(lon,vectorfield['longitude'])):
-            return True
+            return
         if np.all(np.less(lon, vectorfield['longitude'])):
-            return True
-        return False
+            return
+        self.finished = False
+        

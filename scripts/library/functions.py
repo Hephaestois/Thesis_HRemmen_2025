@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import sys
+
 
 def zipCoords(steps):
     '''A function to convert a list of steps into a list of x and y coordinates for plotting'''
@@ -35,5 +37,27 @@ def findClosestIndexCont(vectorfield, lat, lon):
     closestLonIdx = np.argmin(vectorfield['longitude']-lon)
     return closestLonIdx, closestLatIdx
     
-    
+
+def progressBar(progress, max, bar_length=40):
+    """
+    Prints a dynamic progress bar to the terminal.
+
+    Parameters:
+        progress (int): Current progress value (0 to max).
+        max (int): Total or maximum value.
+        bar_length (int): Length of the progress bar in characters.
+    """
+    if max == 0:
+        percent = 1
+    else:
+        percent = progress / max
+
+    block = int(round(bar_length * percent))
+    text = f"\rProgress: [{'#' * block + '-' * (bar_length - block)}] {percent * 100:.1f}%"
+    sys.stdout.write(text)
+    sys.stdout.flush()
+
+    if progress == max:
+        print()  # Move to next line on completion
+
     

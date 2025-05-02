@@ -58,6 +58,8 @@ Options to approach in work right now:
 - Multithread my process 
 
 # April 25-04 
+FOR VIKTORIA: Found a better data source, managed to access it, and made some plots to show it seems correct.
+
 I found a better place to get my data from. 
 (Specific website): https://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3.html
 (General collection of data): https://tds.hycom.org/thredds/catalog.html
@@ -79,6 +81,8 @@ The data has been accessed. I have created a beautiful video ocean_currents_anim
 
 ## Making the random walk in a vector field (that is NOT time constant)
 
+FOR VIKTORIA: I have implemented the time-dependent RW.
+
 The dataset I acquired starts on 01-Jul-2014, which has time value 127092. To make a random walk in a non-constant vector field, I need to start at this time, and then increment by 24 hours when the conditions to do this are met. Because I am doing a Position jump-process, I should probably not increase the time-step every simulation-step. I will include a variable to account for this, probably dependent on the turtles step size. For now, I will just let this variable default to one. 
 
 Another issue is that not every datapoint in the dataset is accounted for. They didn't do NaN, meaning that the 'timeline' is not pretty. That is to say, importing all the time values in the dataset results, not all intervals between datapoints are 3 hours! This is a problem, as I want to do a simulation step every 24, and thus can not just count 8 indices.
@@ -86,7 +90,10 @@ To alleviate this issue, I am going to count the hours since start (with integer
 
 Because I foresee that downloading data is a significant bottleneck in my project, I am goign to also approach simulating the turtles differently. Previously, there used to be one turtle that would do a walk in a constant vector field. This was fine, because there was no functional difference between having one turtle do 600 walks, or 600 turtles doing one walk. Now, however, if I have one turtle doing 600 walks, I need to cycle through the time range 600 times, whereas if 600 turtles do one walk step by step, I need only cycle through the range 1 time. So this 'reversed' approach is how I will implement the new functions, handling a time-non-constant field.
 
+## May 2nd
 
+Today I want to implement the 'feature' in Painter where the turtles travel 2km per day. This might be a bit of a doozy because of how coordinates work. This is because at 0*North (the equator), the horizontal displacement is further apart than the vertical displacement.
+I am going to make a copy of RWinVF, named RWinVF2km. Here, the turtles make steps (influence from both swimming and stream) until they move 2km.
 
 
 
