@@ -1,5 +1,5 @@
 from library.agents import Walker
-from library.functions import zipCoords, getVectorFieldFromExcel
+from library.functions import zipCoords, getVectorFieldFromExcel, progressBar
 import matplotlib.pyplot as plt
 import time
 import numpy as np
@@ -8,15 +8,16 @@ import pickle
 
 ### Simulation options
 # High level stuff
-N_tutels = 40
-N_simulation_steps = 300 #dont go beyond 638 fr fr, exceeds dataset bound
-N_steps_per_timestep = 5
+# N_tutels = 40
+N_simulation_steps = 300 #dont go beyond 638 fr fr, exceeds dataset bound. 1 = 1 day of swimming
+N_steps_per_timestep = 5 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
+N_released_per_day = 1 #Gamma in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
-weight_self = 0.5 # Contribution due to own movement
-weight_VF = 0.5   # Contribution due to vector field
+weight_self = 0 # Contribution due to own movement
+weight_VF = 1   # Contribution due to vector field
 horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
 
@@ -57,47 +58,37 @@ vectorfield = dict()
 vectorfield['latitude'] = latitudes
 vectorfield['longitude'] = longitudes
 
-Tutels = []
+Tutels = [] #These two are simultaneous, i.e. the indices corr between the tutel and the path.
 paths = []
 
-for _ in range(N_tutels):
-    tutel = Walker(
-        init_position=startpos,
-        init_probs = initial_probability,
-        horizontalStepSize=horizontalStepSize, 
-        verticalStepSize=verticalStepSize,
-        weight_self = weight_self, 
-        weight_VF = weight_VF 
-        )
-    Tutels.append(tutel)
-    paths.append([])
-
-done = 0
 for simstep, t in enumerate(simulationTimes):
+    #Initialize a turtle each simstep.
+    for _ in range(N_released_per_day):
+        tutel = Walker(
+            init_position=startpos,
+            init_probs = initial_probability,
+            horizontalStepSize=horizontalStepSize, 
+            verticalStepSize=verticalStepSize,
+            weight_self = weight_self, 
+            weight_VF = weight_VF 
+            )
+        Tutels.append(tutel)
+        paths.append([startpos.copy()] * (simstep * N_steps_per_timestep))
+    progressBar(simstep, N_simulation_steps, start)    
+
     # Searchsorted find the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
     simulationTimeIndex = np.searchsorted(times, t)+startTimeIndex
-    print(simstep)    
     vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]
     vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]
     
-    for j in range(N_tutels):
-        if done > N_tutels*N_steps_per_timestep: 
-            break
-            
+    for j, tutel in enumerate(Tutels):
         for _ in range(N_steps_per_timestep):
-            if Tutels[j].finished:
-                done += 1
-                print(f'Skipped turtle {j} at timestep {simstep}')
+            if tutel.finished:
                 continue
             
-            done = 0
-            Tutels[j].traverseContVectorField(vectorfield, n=1)
-            paths[j].append(Tutels[j].position)
-    
-    if done > N_tutels*N_steps_per_timestep:
-        print(f'Exited at simstep {simstep} as all turtles were done.')
-        break
+            tutel.traverseContVectorField(vectorfield, n=1)
+            paths[j].append(tutel.position)
     
 
 # Save the data so we can do graphical stuff on it.

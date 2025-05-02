@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import sys
-
+import time
 
 def zipCoords(steps):
     '''A function to convert a list of steps into a list of x and y coordinates for plotting'''
@@ -38,13 +38,15 @@ def findClosestIndexCont(vectorfield, lat, lon):
     return closestLonIdx, closestLatIdx
     
 
-def progressBar(progress, max, bar_length=40):
+
+def progressBar(progress, max, start_time, bar_length=40):
     """
-    Prints a dynamic progress bar to the terminal.
+    Prints a dynamic progress bar with estimated time remaining.
 
     Parameters:
         progress (int): Current progress value (0 to max).
         max (int): Total or maximum value.
+        start_time (float): The time when the operation started (time.time()).
         bar_length (int): Length of the progress bar in characters.
     """
     if max == 0:
@@ -53,11 +55,22 @@ def progressBar(progress, max, bar_length=40):
         percent = progress / max
 
     block = int(round(bar_length * percent))
-    text = f"\rProgress: [{'#' * block + '-' * (bar_length - block)}] {percent * 100:.1f}%"
+    elapsed = time.time() - start_time
+    if percent > 0:
+        estimated_total = elapsed / percent
+        remaining = estimated_total - elapsed
+    else:
+        remaining = 0
+
+    elapsed_str = time.strftime("%H:%M:%S", time.gmtime(elapsed))
+    remaining_str = time.strftime("%H:%M:%S", time.gmtime(remaining))
+
+    text = (
+        f"\rProgress: [{'#' * block + '-' * (bar_length - block)}] "
+        f"{percent * 100:.1f}% | Elapsed: {elapsed_str} | ETA: {remaining_str}"
+    )
     sys.stdout.write(text)
     sys.stdout.flush()
 
     if progress == max:
         print()  # Move to next line on completion
-
-    
