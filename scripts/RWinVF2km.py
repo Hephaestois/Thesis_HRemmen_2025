@@ -9,7 +9,7 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_steps = 300 #dont go beyond 638 fr fr, exceeds dataset bound. 1 = 1 day of swimming
+N_simulation_steps = 50 #dont go beyond 638 fr fr, exceeds dataset bound. 1 = 1 day of swimming
 N_steps_per_timestep = 5 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
 N_released_per_day = 5 #Gamma=5 in Painter, amount of released tutels
 
@@ -43,7 +43,6 @@ dataset = netCDF4.Dataset(url)
 
 lons_idx = range(1885,2113,longitude_data_stepsize)
 lats_idx = range(2050,2176-delta,latitude_data_stepsize)
-
 
 # These three are pretty important, as they are used to precompute some stuff, best saved locally
 longitudes = dataset.variables['lon'][lons_idx] # Range -29.2, -11.28

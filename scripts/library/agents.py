@@ -1,5 +1,6 @@
 from library.functions import chooseDirection, directionsFromAngles, findClosestIndex, findClosestIndexCont
 import numpy as np
+import random
 
 class Grid:
     
@@ -35,15 +36,15 @@ class Walker:
         self.finished = False
         
         
-    def moveRandom(self, randomnum):
+    def moveRandom(self):
         # the weights for these are adapted using the flowspeed.
-        weight_VF = 1-np.divide(self.initProbs+self.localFlowSpeed, 1+self.localFlowSpeed)
+        weight_VF = np.divide(self.initProbs+self.localFlowSpeed, 1+self.localFlowSpeed)
         weight_self = 1 - weight_VF        
         
         weightedProbs = np.multiply(self.initProbs, weight_self) + np.multiply(self.probs, weight_VF)
         
         weightedCumProbs = np.cumsum(weightedProbs)
-        direction = self.directionToStep(chooseDirection(weightedCumProbs, randomnum)) #This is a coordinate, unit direction.
+        direction = self.directionToStep(chooseDirection(weightedCumProbs, random.random())) #This is a coordinate, unit direction.
         self.position += direction
         return self.position #Might be useful later?
     
@@ -109,9 +110,9 @@ class Walker:
         lon = self.position[0]
         lat = self.position[1]
         
-        closest_idx = findClosestIndexCont(vectorfield, lat, lon)
-        horizontal_field_velocity = vectorfield['water_u'][closest_idx]
-        vertical_field_velocity = vectorfield['water_v'][closest_idx]
+        closest_idx_lon, closest_idx_lat = findClosestIndexCont(vectorfield, lat, lon)
+        horizontal_field_velocity = vectorfield['water_u'][closest_idx_lon, closest_idx_lat]
+        vertical_field_velocity = vectorfield['water_v'][closest_idx_lon, closest_idx_lat]
         self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
         sum_field_velocity = horizontal_field_velocity + vertical_field_velocity
 
@@ -137,13 +138,12 @@ class Walker:
     
     def traverseVectorField(self, vectorfield, n):
         # # Precompute random directions for all steps
-        randomNumbers = np.random.rand(n)
         positions = np.zeros([n+1,2])
         positions[0]=self.position
         for i in range(n):
             #This automatically updates the directions
             self.getRWBiasInField(vectorfield)
-            newpos = self.moveRandom(randomNumbers[i])
+            newpos = self.moveRandom()
             positions[i+1] = newpos
             if self.exceeds(vectorfield):
                 positions = positions[0:i+1, 0:2]
@@ -156,13 +156,12 @@ class Walker:
     def traverseContVectorField(self,vectorfield,n):
         self.exceeds(vectorfield)
         
-        randomNumbers = np.random.rand(n)
         positions = np.zeros([n+1,2])
         positions[0]=self.position
         for i in range(n):
             #This automatically updates the directions
             self.getRWBiasInContField(vectorfield)
-            newpos = self.moveRandom(randomNumbers[i])
+            newpos = self.moveRandom()
             positions[i+1] = newpos
             if self.exceeds(vectorfield):
                 positions = positions[0:i+1, 0:2]

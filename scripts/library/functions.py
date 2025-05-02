@@ -33,12 +33,10 @@ def findClosestIndex(vectorfield, lat, lon):
     return index
 
 def findClosestIndexCont(vectorfield, lat, lon):
-    closestLatIdx = np.argmin(vectorfield['latitude']-lat)
-    closestLonIdx = np.argmin(vectorfield['longitude']-lon)
-    return closestLonIdx, closestLatIdx
+    closestLatIdx = np.argmin(np.abs(vectorfield['latitude']-lat))
+    closestLonIdx = np.argmin(np.abs(vectorfield['longitude']-lon))
+    return [closestLonIdx, closestLatIdx]
     
-
-
 def progressBar(progress, max, start_time, bar_length=40):
     """
     Prints a dynamic progress bar with estimated time remaining.
