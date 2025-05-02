@@ -11,13 +11,11 @@ import pickle
 # N_tutels = 40
 N_simulation_steps = 300 #dont go beyond 638 fr fr, exceeds dataset bound. 1 = 1 day of swimming
 N_steps_per_timestep = 5 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
-N_released_per_day = 1 #Gamma in Painter, amount of released tutels
+N_released_per_day = 5 #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
-weight_self = 0 # Contribution due to own movement
-weight_VF = 1   # Contribution due to vector field
 horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
 
@@ -58,23 +56,23 @@ vectorfield = dict()
 vectorfield['latitude'] = latitudes
 vectorfield['longitude'] = longitudes
 
-Tutels = [] #These two are simultaneous, i.e. the indices corr between the tutel and the path.
+Tutels = []
 paths = []
+start_frames = []
 
 for simstep, t in enumerate(simulationTimes):
-    #Initialize a turtle each simstep.
     for _ in range(N_released_per_day):
         tutel = Walker(
             init_position=startpos,
-            init_probs = initial_probability,
+            init_probs=initial_probability,
             horizontalStepSize=horizontalStepSize, 
-            verticalStepSize=verticalStepSize,
-            weight_self = weight_self, 
-            weight_VF = weight_VF 
-            )
+            verticalStepSize=verticalStepSize
+        )
         Tutels.append(tutel)
-        paths.append([startpos.copy()] * (simstep * N_steps_per_timestep))
-    progressBar(simstep, N_simulation_steps, start)    
+        paths.append([])
+        start_frames.append(simstep * N_steps_per_timestep)  # Frame when this turtle starts walking
+
+    progressBar(simstep, N_simulation_steps-1, start)    
 
     # Searchsorted find the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
@@ -83,6 +81,9 @@ for simstep, t in enumerate(simulationTimes):
     vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]
     
     for j, tutel in enumerate(Tutels):
+        if tutel.finished:
+            continue
+
         for _ in range(N_steps_per_timestep):
             if tutel.finished:
                 continue
@@ -93,7 +94,8 @@ for simstep, t in enumerate(simulationTimes):
 
 # Save the data so we can do graphical stuff on it.
 with open('createdData.pkl', 'wb') as file:
-    pickle.dump(paths, file)
+    pickle.dump((paths, start_frames), file)
+
 
 end = time.time()
 print(f"{1000 * (end - start)} milliseconds elapsed")

@@ -1,5 +1,5 @@
 from library.agents import Walker
-from library.functions import zipCoords, getVectorFieldFromExcel
+from library.functions import zipCoords, getVectorFieldFromExcel, progressBar
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
@@ -9,13 +9,11 @@ import numpy as np
 ### Simulation options
 # High level stuff
 N_swims = 40
-swim_length = 200
+swim_length = 600
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
-weight_self = 0 # Contribution due to own movement
-weight_VF = 1   # Contribution due to vector field
 horizontalStepSize = 0.05 # Turtle step size
 verticalStepSize = 0.05   # Turtle step size
 
@@ -37,13 +35,12 @@ points = []
 
 
 for i in range(N_swims):
+    progressBar(i, N_swims-1, start)
     Tutel = Walker(
         init_position=startpos,
         init_probs = initial_probability,
         horizontalStepSize=horizontalStepSize, 
-        verticalStepSize=verticalStepSize,
-        weight_self = weight_self, 
-        weight_VF = weight_VF 
+        verticalStepSize=verticalStepSize
         )
     locations = Tutel.traverseVectorField(vectorfield, swim_length) #swim_length
     plotvals = zipCoords(locations)

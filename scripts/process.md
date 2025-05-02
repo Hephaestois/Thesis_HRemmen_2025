@@ -95,7 +95,15 @@ Because I foresee that downloading data is a significant bottleneck in my projec
 Today I want to implement the 'feature' in Painter where the turtles travel 2km per day. This might be a bit of a doozy because of how coordinates work. This is because at 0*North (the equator), the horizontal displacement is further apart than the vertical displacement.
 I am going to make a copy of RWinVF, named RWinVF2km. Here, the turtles make steps (influence from both swimming and stream) until they move 2km.
 
-
+Status update: I just woke from my programmer trance. I see data registers in my cpu itself. 
+Anyway, I have implemented a number of features:
+    - the probability of moving in a direction now depends on the intensity of the flow of the vector field (so no more weights for the tutels)
+    - I have added some 'advanced' tools to make videos, so now the RWinVF2km, which is the new iteration of RWinVF, can make very nice figures
+    - I created a progress bar (I was going insane over printing indices), and gave it a time elapsed and time left thing
+    - I tried to get the dataset offline for faster runtime (I think it is mostly time limited rn), but failed
+    - I made it so that turtles are released 'dayly' as in Painter
+    - I made it so that turtles take steps 5 steps every day. I want to extend this to be 'steps until 2km' as in Painter, but this would mean converting angles lon,lat to distances, which is nontrivial.
+    - I have tried to optimize the working of some functions. Some stuff is VERY slow right now, and I have some hitches as to why, but some solutions would take a long time to fix. Maybe even longer than it would yield in time I can spend thinking about other stuff. 
 
 
 

@@ -5,13 +5,16 @@ import pickle
 from library.functions import zipCoords
 from time import time
 
+##For Viktoria: This function is slow as hell. Use at your own discretion. Takes data created by either RWinVF or RWinVF2km.
+
 # === Toggle here ===
 plot_paths = False         # ← Set to False to hide trajectory lines
 walk_opacity = 0.01       # Only applies if plot_paths = True
 
 # Load data
 with open('createdData.pkl', 'rb') as file:
-    paths = pickle.load(file)
+    paths, start_frames = pickle.load(file)
+
 
 # Prepare figure
 fig, ax = plt.subplots(figsize=[10, 4], dpi=150)
@@ -21,7 +24,7 @@ ax.set_ylim(41.5, 47)
 # Preprocess paths
 processed_paths = [zipCoords(path) for path in paths]
 path_lengths = [len(p[0]) for p in processed_paths]
-max_steps = max(path_lengths)
+max_steps = max(start + len(p[0]) for p, start in zip(processed_paths, start_frames))
 
 # Create plot elements
 lines = []
@@ -43,20 +46,37 @@ for x, y in processed_paths:
 startTime = time()
 # Animation update function
 def update(frame):
-    progressBar(frame, max_steps, startTime)
+    progressBar(frame, max_steps-1, startTime)
+    artists = []
+
     for i, (x, y) in enumerate(processed_paths):
+        start_frame = start_frames[i]
         plen = path_lengths[i]
-        if frame < plen:
+
+        if frame < start_frame:
+            # Turtle hasn't started yet
             if plot_paths:
-                lines[i].set_data(x[:frame + 1], y[:frame + 1])
-            dots[i].set_data(x[frame], y[frame])
+                lines[i].set_data([], [])
+            dots[i].set_data([], [])
+            crosses[i].set_data([], [])
+        elif frame < start_frame + plen:
+            idx = frame - start_frame
+            if plot_paths:
+                lines[i].set_data(x[:idx + 1], y[:idx + 1])
+                artists.append(lines[i])
+            dots[i].set_data(x[idx], y[idx])
             crosses[i].set_data([], [])
         else:
             if plot_paths:
                 lines[i].set_data(x, y)
+                artists.append(lines[i])
             dots[i].set_data([], [])
             crosses[i].set_data(x[-1], y[-1])
-    return (dots + crosses + starts) if not plot_paths else (lines + dots + crosses + starts)
+
+        artists.extend([dots[i], crosses[i], starts[i]])
+
+    return artists
+
 
 # Create animation
 anim = FuncAnimation(fig, update, frames=max_steps, interval=20, blit=True)

@@ -13,7 +13,6 @@ class Walker:
             init_probs=(0.25, 0.25, 0.25, 0.25), 
             orientationFunction=lambda x: 0, 
             horizontalStepSize=1, verticalStepSize=1, 
-            weight_self=0.5, weight_VF=0.5
                 ):
         
         self.position = np.array(init_position)   # The coordinate where our walker is
@@ -30,15 +29,20 @@ class Walker:
         # Related to vector field dynamics
         self.horizontalStepSize = horizontalStepSize
         self.verticalStepSize = verticalStepSize
-        self.weight_self = weight_self
-        self.weight_VF = weight_VF
+        self.localFlowSpeed = 0
         
         #Has the turtle hit a border?
         self.finished = False
         
         
     def moveRandom(self, randomnum):
-        weightedCumProbs = self.initCumProbs*self.weight_self + self.cumProbs*self.weight_VF
+        # the weights for these are adapted using the flowspeed.
+        weight_VF = 1-np.divide(self.initProbs+self.localFlowSpeed, 1+self.localFlowSpeed)
+        weight_self = 1 - weight_VF        
+        
+        weightedProbs = np.multiply(self.initProbs, weight_self) + np.multiply(self.probs, weight_VF)
+        
+        weightedCumProbs = np.cumsum(weightedProbs)
         direction = self.directionToStep(chooseDirection(weightedCumProbs, randomnum)) #This is a coordinate, unit direction.
         self.position += direction
         return self.position #Might be useful later?
@@ -100,17 +104,20 @@ class Walker:
         self.cumProbs = np.cumsum(self.probs)
         
     def getRWBiasInContField(self, vectorfield):
+        # This function updates the weights of the walker in the vector field. Strong flow means low self influence.
+        # MoveRandom then uses these weights.
         lon = self.position[0]
         lat = self.position[1]
         
         closest_idx = findClosestIndexCont(vectorfield, lat, lon)
         horizontal_field_velocity = vectorfield['water_u'][closest_idx]
         vertical_field_velocity = vectorfield['water_v'][closest_idx]
-        # Normalization trick
-        total_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
-        horiz_prob = np.abs(horizontal_field_velocity)/total_velocity
-        vert_prob = np.abs(vertical_field_velocity)/total_velocity
-        # Now these probabilities add up to 1.
+        self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
+        sum_field_velocity = horizontal_field_velocity + vertical_field_velocity
+
+        #Only for normalization. Flow speed determines the weight
+        horiz_prob = horizontal_field_velocity / sum_field_velocity
+        vert_prob = vertical_field_velocity / sum_field_velocity
         
         if horizontal_field_velocity >= 0:
             if vertical_field_velocity >= 0:
