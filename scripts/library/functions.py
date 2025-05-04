@@ -2,30 +2,32 @@ import numpy as np
 import pandas as pd
 import sys
 import time
+import random
 
 def zipCoords(steps):
     '''A function to convert a list of steps into a list of x and y coordinates for plotting'''
     return np.transpose(np.array(steps))
 
-def chooseDirection(cumProbs, randomNumber):
+def chooseDirection(cumProbs):
+    '''Converts from a cumulative probability list lrud to a direction chosen according to those probabilities.'''
+    randomNumber = random.random()
+    
     if randomNumber <= cumProbs[0]:
         return np.array([-1, 0])
+    
     if randomNumber <= cumProbs[1]:
         return np.array([1, 0])
+    
     if randomNumber <= cumProbs[2]:
         return np.array([0, 1])
-    # randomNumber <= cumProbs[3] = 1: always happens
+    
+    # randomNumber <= cumProbs[3] = 1: always happens. Due to rounding errors (somewhere a prob. gets created with division), this function uses exceeds.
     return np.array([0, -1])
 
 def directionsFromAngles(angle):
     return np.array([np.cos(angle), np.sin(angle)])
-
-def getVectorFieldFromExcel(filename):
-    #This is currently dependent on deleting line 2 in the CSV. This should be fixed.
-    data = pd.read_csv(f'{filename}')
-    return data
     
-def findClosestIndexCont(vectorfield, lat, lon):
+def findClosestIndex(vectorfield, lat, lon):
     closestLatIdx = np.argmin(np.abs(vectorfield['latitude']-lat))
     closestLonIdx = np.argmin(np.abs(vectorfield['longitude']-lon))
     return [closestLonIdx, closestLatIdx]

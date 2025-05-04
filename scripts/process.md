@@ -114,13 +114,16 @@ Ereyesterday I implemented a few features that have to do with plotting, and thi
 To be certain everything I do is according to the paper by Painter and Hillen, I would like to spend this evening just verifying and documenting a lot of stuff in my program. Every function should get a '''docstring''', and hopefully I can iron out some of the magic trick that currently 'litter' through my stuff. I would also like to sort the file tree structure a little bit, as it is getting too wild.
 
 Because the model is currently quite advanced, I can 'make out' the similarities with Painter and Hillen, but I can not reproduce their findings yet. In part because I do not know where they bounded their simulation area, but also because I think my influence between flow stength and turtle authority is not 'calibrated' correctly. Allthough my turtles currently do not have a directional statistic, including this would make their behaviour more conflicting with Painter and Hillen. This is of course not an issue, but I am trying to figure out why I am _not_ getting their results. When I think adding the directionality will improve the result, I will add the directional statistics.
+Continuing on this, I have figured out the mistake! And it was pretty big and very explicable! I wrongly implemented some math for the probabilities, and as such they did not always add to one, usually to less than one. Some instances going as low as 0.5. Because of how I implemented the probability, so that the last cumulative probability always happens if no other happens, this means the last (lrud - Down) was happening an unreasonable amount of the time. With this kink ironed out, I immediately see the claim of Painter to be way more believable, namely that not every single turtle makes it :sad:
 
 I just found out the boundaries Painter used for their continuous model. For the horizontal boundaries, they used absorbing BC, and for the vertical ones no flow BC. Horiz.:42.5-46.5N, Vert.: 28-12W
 cont model: 28/12 vertical are no flow
 
-I have the hitch that the traversal functions are doing precisely the same thing, so I think I might combine them. (The time-dep doesn't actually take a time dep VF, it gets a snapshot which is calculated in main, one file above it.) The only difference is the getRWBiasIn[Cont]VF.
+I have the hitch that the traversal functions are doing precisely the same thing, so I think I might combine them. (The time-dep doesn't actually take a time dep VF, it gets a snapshot which is calculated in main, one file above it.) The only difference is the getRWBiasIn[Cont]VF. These have by now been combined, so that every VF-dependent thing uses traverseVF. Very modern 
 
 To add to the mystery, the weight factor for the VF influence is doing weird stuff. I think it is making the strongest direction always be chosen, making the RW into a sort of manhattan distance process. It yields very funky results. See videos 'factor=n'
+
+
 
 
 

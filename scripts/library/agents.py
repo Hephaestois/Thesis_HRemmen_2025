@@ -1,4 +1,4 @@
-from library.functions import chooseDirection, directionsFromAngles, findClosestIndexCont
+from library.functions import chooseDirection, directionsFromAngles, findClosestIndex
 import numpy as np
 import random
 
@@ -9,7 +9,7 @@ class Grid:
 class Walker:
     '''Our swimming turtles are defined under the Walker class, as they perform a random walk.
     
-    
+    For a 'simple' RW, see position/velocityjump process. 
     '''
     def __init__(
             self, 
@@ -34,6 +34,7 @@ class Walker:
         self.horizontalStepSize = horizontalStepSize
         self.verticalStepSize = verticalStepSize
         self.localFlowSpeed = 0
+        self.localFlow = np.array([0,0])
         
         #Has the turtle hit a border?
         self.finished = False
@@ -46,21 +47,17 @@ class Walker:
         I use Viktoria's proposal for the determination of the flow speed, so that we still
         acquire valid probabilities (SUM=1), and are able to factor in the weight of the vector field.
         
-        TODO: Study how the parameter localFlowSpeed should be multiplied so that 
+        TODO: Study how the parameter localFlowSpeed should be chosen for 'correct' performance. Currently =1 does not sound any mental alarms.
         '''
         # Correction factor for the localFlowSpeed, because of unit conversions. Currently unused (=1)
         flowSpeedMultiplier = 1
         
-        # the weights for these are adapted using the flowspeed.
-        weight_VF = np.divide(self.initProbs+self.localFlowSpeed*flowSpeedMultiplier, 1+self.localFlowSpeed*flowSpeedMultiplier)
-        weight_self = 1 - weight_VF        
-        
-        # These are 4-vectors (lrud) containing the final local movement probability
-        weightedProbs = np.multiply(self.initProbs, weight_self) + np.multiply(self.probs, weight_VF)
+        # The self.localFlow is a lrud vector of the flow components. There are two zeros, in the direction where the flow points away from.
+        weightedProbs = np.divide(self.initProbs+flowSpeedMultiplier*self.localFlow, 1 + flowSpeedMultiplier*np.sum(self.localFlow))
         weightedCumProbs = np.cumsum(weightedProbs)
-        
+
         # This function chooses a direction based on the probabilities. The outer makes it respect the specified grid size.
-        direction = self.directionToStep(chooseDirection(weightedCumProbs, random.random())) #This is a coordinate, unit direction.
+        direction = self.directionToStep(chooseDirection(weightedCumProbs)) #This is a coordinate, unit direction.
         self.position += direction
         return self.position
     
@@ -88,47 +85,14 @@ class Walker:
         self.position = positions[-1]
         return positions
     
-    def getRWBiasInField(self, vectorfield):
-        lon = self.position[0]
-        lat = self.position[1]
-        
-        closest_idx = findClosestIndex(vectorfield, lat, lon)
-        # x' = x / (x+y), y' = y / (x+y), 
-        # so that x'+y'=1 making it a feasible 
-        # (unscaled!) prob.
-        # Problem is that movement is always along vec field.
-        # Negativity of field velocity is handled with logic instead math.
-        
-        horizontal_field_velocity = vectorfield['water_u'][closest_idx]
-        vertical_field_velocity = vectorfield['water_v'][closest_idx]
-        self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
-        sum_field_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
-
-        #Only for normalization. Flow speed determines the weight
-        horiz_prob = horizontal_field_velocity / sum_field_velocity
-        vert_prob = vertical_field_velocity / sum_field_velocity
-        
-        
-        #now these probabilities add up to 1.
-        if horizontal_field_velocity >= 0:
-            if vertical_field_velocity >= 0:
-                self.probs = np.array([0, horiz_prob, vert_prob, 0]) # probability of moving l, r, u, d.
-            else:
-                self.probs = np.array([0, horiz_prob, 0, vert_prob])
-        else:
-            if vertical_field_velocity >= 0:
-                self.probs = np.array([horiz_prob, 0, vert_prob, 0])
-            else:
-                self.probs = np.array([horiz_prob, 0, 0, vert_prob])
-        self.cumProbs = np.cumsum(self.probs)
-
     def getRWBiasInVF(self, vectorfield):
         lon = self.position[0]
         lat = self.position[1]
         
-        closest_idx_lon, closest_idx_lat = findClosestIndexCont(vectorfield, lat, lon)
+        closest_idx_lon, closest_idx_lat = findClosestIndex(vectorfield, lat, lon)
         horizontal_field_velocity = vectorfield['water_u'][closest_idx_lon, closest_idx_lat]
         vertical_field_velocity = vectorfield['water_v'][closest_idx_lon, closest_idx_lat]
+        self.localFlow = np.array([horizontal_field_velocity, vertical_field_velocity])
         self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
         sum_field_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
 
@@ -139,13 +103,17 @@ class Walker:
         if horizontal_field_velocity >= 0:
             if vertical_field_velocity >= 0:
                 self.probs = np.array([0, horiz_prob, vert_prob, 0]) # probability of moving l, r, u, d.
+                self.localFlow = np.array([0, horizontal_field_velocity, vertical_field_velocity, 0])
             else:
                 self.probs = np.array([0, horiz_prob, 0, vert_prob])
+                self.localFlow = np.array([0, horizontal_field_velocity, 0, vertical_field_velocity])
         else:
             if vertical_field_velocity >= 0:
                 self.probs = np.array([horiz_prob, 0, vert_prob, 0])
+                self.localFlow = np.array([horizontal_field_velocity, 0, vertical_field_velocity, 0])
             else:
                 self.probs = np.array([horiz_prob, 0, 0, vert_prob])
+                self.localFlow = np.array([horizontal_field_velocity, 0, 0, vertical_field_velocity])
         self.cumProbs = np.cumsum(self.probs)
 
     def directionToStep(self, direction):
@@ -201,4 +169,3 @@ class Walker:
         if np.all(np.less(lon, vectorfield['longitude'])):
             return
         self.finished = False
-        
