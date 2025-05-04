@@ -107,7 +107,8 @@ Anyway, I have implemented a number of features:
 
 ## May 4th
 
-FOR VIKTORIA: Mostly refactored code, cleaned up old garbage and made sure stuff works as intended and is scientific accordance.
+FOR VIKTORIA: Mostly refactored code, cleaned up old garbage and made sure stuff works as intended and is scientific accordance. Fixed a huge error regarding probability in the code.
+
 
 Ereyesterday I implemented a few features that have to do with plotting, and thing I broke something at the end. So my plots had me believe, anyway (What I saw what the turtles all using the same probability and sampling points in the vector field to decide what to do). Today, after correcting a missing absolute value sign, I ran the thing again to check for anomalies, and it seems to have been fixed.
 
@@ -123,7 +124,7 @@ I have the hitch that the traversal functions are doing precisely the same thing
 
 To add to the mystery, the weight factor for the VF influence is doing weird stuff. I think it is making the strongest direction always be chosen, making the RW into a sort of manhattan distance process. It yields very funky results. See videos 'factor=n'
 
-
+Currently, when taking the VF to be quite rough, a VERY clear influence of the gridding can be seen (see factor=1 and factor=10). To solve this, tomorrow I will do linear VF interpolation.
 
 
 
