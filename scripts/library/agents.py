@@ -1,4 +1,4 @@
-from library.functions import chooseDirection, directionsFromAngles, findClosestIndex, findClosestIndexCont
+from library.functions import chooseDirection, directionsFromAngles, findClosestIndexCont
 import numpy as np
 import random
 
@@ -7,7 +7,10 @@ class Grid:
     pass
 
 class Walker:
-    '''A walker is an object that 'walks' a 2d grid.'''
+    '''Our swimming turtles are defined under the Walker class, as they perform a random walk.
+    
+    
+    '''
     def __init__(
             self, 
             init_position=np.array([0, 0]), 
@@ -37,16 +40,29 @@ class Walker:
         
         
     def moveRandom(self):
+        '''This function is responsible for handling the end-decision of where a turtle moves. 
+        
+        It relies on the local Flow Speed, and the local and global probabilities of movement.
+        I use Viktoria's proposal for the determination of the flow speed, so that we still
+        acquire valid probabilities (SUM=1), and are able to factor in the weight of the vector field.
+        
+        TODO: Study how the parameter localFlowSpeed should be multiplied so that 
+        '''
+        # Correction factor for the localFlowSpeed, because of unit conversions. Currently unused (=1)
+        flowSpeedMultiplier = 1
+        
         # the weights for these are adapted using the flowspeed.
-        weight_VF = np.divide(self.initProbs+self.localFlowSpeed, 1+self.localFlowSpeed)
+        weight_VF = np.divide(self.initProbs+self.localFlowSpeed*flowSpeedMultiplier, 1+self.localFlowSpeed*flowSpeedMultiplier)
         weight_self = 1 - weight_VF        
         
+        # These are 4-vectors (lrud) containing the final local movement probability
         weightedProbs = np.multiply(self.initProbs, weight_self) + np.multiply(self.probs, weight_VF)
-        
         weightedCumProbs = np.cumsum(weightedProbs)
+        
+        # This function chooses a direction based on the probabilities. The outer makes it respect the specified grid size.
         direction = self.directionToStep(chooseDirection(weightedCumProbs, random.random())) #This is a coordinate, unit direction.
         self.position += direction
-        return self.position #Might be useful later?
+        return self.position
     
     def positionJumpProcess(self, n):
         # Precompute random directions for all steps
@@ -85,10 +101,12 @@ class Walker:
         
         horizontal_field_velocity = vectorfield['water_u'][closest_idx]
         vertical_field_velocity = vectorfield['water_v'][closest_idx]
-        total_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
-        
-        horiz_prob = np.abs(horizontal_field_velocity)/total_velocity
-        vert_prob = np.abs(vertical_field_velocity)/total_velocity
+        self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
+        sum_field_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
+
+        #Only for normalization. Flow speed determines the weight
+        horiz_prob = horizontal_field_velocity / sum_field_velocity
+        vert_prob = vertical_field_velocity / sum_field_velocity
         
         
         #now these probabilities add up to 1.
@@ -103,10 +121,8 @@ class Walker:
             else:
                 self.probs = np.array([horiz_prob, 0, 0, vert_prob])
         self.cumProbs = np.cumsum(self.probs)
-        
-    def getRWBiasInContField(self, vectorfield):
-        # This function updates the weights of the walker in the vector field. Strong flow means low self influence.
-        # MoveRandom then uses these weights.
+
+    def getRWBiasInVF(self, vectorfield):
         lon = self.position[0]
         lat = self.position[1]
         
@@ -114,7 +130,7 @@ class Walker:
         horizontal_field_velocity = vectorfield['water_u'][closest_idx_lon, closest_idx_lat]
         vertical_field_velocity = vectorfield['water_v'][closest_idx_lon, closest_idx_lat]
         self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
-        sum_field_velocity = horizontal_field_velocity + vertical_field_velocity
+        sum_field_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
 
         #Only for normalization. Flow speed determines the weight
         horiz_prob = horizontal_field_velocity / sum_field_velocity
@@ -136,50 +152,51 @@ class Walker:
         #Makes a step move on a grid. 
         return np.array([self.horizontalStepSize*direction[0], self.verticalStepSize*direction[1]])
     
-    def traverseVectorField(self, vectorfield, n):
-        # # Precompute random directions for all steps
-        positions = np.zeros([n+1,2])
-        positions[0]=self.position
-        for i in range(n):
-            #This automatically updates the directions
-            self.getRWBiasInField(vectorfield)
-            newpos = self.moveRandom()
-            positions[i+1] = newpos
-            if self.exceeds(vectorfield):
-                positions = positions[0:i+1, 0:2]
-                break
-        
-        self.position = positions[-1]
-        
-        return positions
-    
-    def traverseContVectorField(self,vectorfield,n):
+    def traverseVF(self, vectorfield, n=1):
+        '''Traversal of a vector field. Irregarless of time-variable, this is managed in the level above!!
+        The vector field here is a snapshot in time, and should be used for small time- and space-steps.
+        '''
         self.exceeds(vectorfield)
         
-        positions = np.zeros([n+1,2])
+        # n=1 always now
+        positions = np.zeros([2,2])
         positions[0]=self.position
-        for i in range(n):
-            #This automatically updates the directions
-            self.getRWBiasInContField(vectorfield)
-            newpos = self.moveRandom()
-            positions[i+1] = newpos
-            if self.exceeds(vectorfield):
-                positions = positions[0:i+1, 0:2]
-                break
         
+        # Update the probabilities based on the local position
+        self.getRWBiasInVF(vectorfield)
+        
+        # Take a random step and save it here. moveRandom returns the new position.
+        newpos = self.moveRandom()
+        positions[1] = newpos
+    
         self.position = positions[-1]
         return positions
     
     def exceeds(self, vectorfield):
+        '''Function to check if turtle exceeds the simulation range. 
+        Called form traverse[Cont]VF. 
+        
+        When the VF is exceeded, for plotting purposes set position to the boundary.
+        '''
+        
+        # Programming trick Only when all if's are false (so the turtle doesn't exceed) is this going to return True: 
         self.finished = True
+        
         lon = self.position[0]
         lat = self.position[1]
         
-        if np.all(np.greater(lat,vectorfield['latitude'])):
+        # These boundaries are according to Painter, page 27:
+        # Stop sim when latitude exceeding 46.5 or 42.5 horizontal. The vertical boundaries are far enough so that they are not reached. 
+        if np.all(np.greater(lat, 46.5)):
+            # Force latitude to this value.
+            self.position[1]=46.5
             return
-        if np.all(np.less(lat, vectorfield['latitude'])):
+        if np.all(np.less(lat, 42.5)):
+            self.position[1]=42.5
             return
+        
         if np.all(np.greater(lon,vectorfield['longitude'])):
+            #We don't really care for the longitudinal exceeding, that doesn't really happen.
             return
         if np.all(np.less(lon, vectorfield['longitude'])):
             return

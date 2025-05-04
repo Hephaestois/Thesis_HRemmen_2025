@@ -9,9 +9,9 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_steps = 50 #dont go beyond 638 fr fr, exceeds dataset bound. 1 = 1 day of swimming
+N_simulation_steps = 20 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
 N_steps_per_timestep = 5 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
-N_released_per_day = 5 #Gamma=5 in Painter, amount of released tutels
+N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4])
@@ -29,11 +29,7 @@ endTime = startTime + timeResolution*N_simulation_steps
 # Spatial dataset related stuff
 longitude_data_stepsize = 16 #Multiples of 0.04 degree
 latitude_data_stepsize  = 8 #Multiples of 0.08 degree
-delta = 8                   #For correcting size mismatch
-
-### Plotting options
-walk_opacity = 0.2
-
+delta = 8                   #For correcting size mismatch in latitudes/longitudes.
 
 ### END of options
 
@@ -87,14 +83,16 @@ for simstep, t in enumerate(simulationTimes):
             if tutel.finished:
                 continue
             
-            tutel.traverseContVectorField(vectorfield, n=1)
+            tutel.traverseVF(vectorfield, n=1)
             paths[j].append(tutel.position)
     
 
+print('Writing data to storage...')
 # Save the data so we can do graphical stuff on it.
 with open('createdData.pkl', 'wb') as file:
     pickle.dump((paths, start_frames), file)
 
+print("Done!")
 
 end = time.time()
 print(f"{1000 * (end - start)} milliseconds elapsed")

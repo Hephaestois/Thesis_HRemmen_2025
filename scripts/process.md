@@ -105,9 +105,22 @@ Anyway, I have implemented a number of features:
     - I made it so that turtles take steps 5 steps every day. I want to extend this to be 'steps until 2km' as in Painter, but this would mean converting angles lon,lat to distances, which is nontrivial.
     - I have tried to optimize the working of some functions. Some stuff is VERY slow right now, and I have some hitches as to why, but some solutions would take a long time to fix. Maybe even longer than it would yield in time I can spend thinking about other stuff. 
 
+## May 4th
 
+FOR VIKTORIA: Mostly refactored code, cleaned up old garbage and made sure stuff works as intended and is scientific accordance.
 
+Ereyesterday I implemented a few features that have to do with plotting, and thing I broke something at the end. So my plots had me believe, anyway (What I saw what the turtles all using the same probability and sampling points in the vector field to decide what to do). Today, after correcting a missing absolute value sign, I ran the thing again to check for anomalies, and it seems to have been fixed.
 
+To be certain everything I do is according to the paper by Painter and Hillen, I would like to spend this evening just verifying and documenting a lot of stuff in my program. Every function should get a '''docstring''', and hopefully I can iron out some of the magic trick that currently 'litter' through my stuff. I would also like to sort the file tree structure a little bit, as it is getting too wild.
+
+Because the model is currently quite advanced, I can 'make out' the similarities with Painter and Hillen, but I can not reproduce their findings yet. In part because I do not know where they bounded their simulation area, but also because I think my influence between flow stength and turtle authority is not 'calibrated' correctly. Allthough my turtles currently do not have a directional statistic, including this would make their behaviour more conflicting with Painter and Hillen. This is of course not an issue, but I am trying to figure out why I am _not_ getting their results. When I think adding the directionality will improve the result, I will add the directional statistics.
+
+I just found out the boundaries Painter used for their continuous model. For the horizontal boundaries, they used absorbing BC, and for the vertical ones no flow BC. Horiz.:42.5-46.5N, Vert.: 28-12W
+cont model: 28/12 vertical are no flow
+
+I have the hitch that the traversal functions are doing precisely the same thing, so I think I might combine them. (The time-dep doesn't actually take a time dep VF, it gets a snapshot which is calculated in main, one file above it.) The only difference is the getRWBiasIn[Cont]VF.
+
+To add to the mystery, the weight factor for the VF influence is doing weird stuff. I think it is making the strongest direction always be chosen, making the RW into a sort of manhattan distance process. It yields very funky results. See videos 'factor=n'
 
 
 

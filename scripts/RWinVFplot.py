@@ -8,8 +8,8 @@ from time import time
 ##For Viktoria: This function is slow as hell. Use at your own discretion. Takes data created by either RWinVF or RWinVF2km.
 
 # === Toggle here ===
-plot_paths = False         # ← Set to False to hide trajectory lines
-walk_opacity = 0.01       # Only applies if plot_paths = True
+plot_paths = True         # Show/don't show turtle path lines
+walk_opacity = 0.01       # Only effective if plot_paths = True
 
 # Load data
 with open('createdData.pkl', 'rb') as file:
@@ -77,11 +77,11 @@ def update(frame):
 
     return artists
 
-
+print("Starting animation...")
 # Create animation
 anim = FuncAnimation(fig, update, frames=max_steps, interval=20, blit=True)
 
-# Save as video or gif
+# Save video
 writer = FFMpegWriter(fps=50)
 anim.save("randomWalkAnimation.mp4", writer=writer)
 print('Finished')
