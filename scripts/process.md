@@ -126,11 +126,16 @@ To add to the mystery, the weight factor for the VF influence is doing weird stu
 
 Currently, when taking the VF to be quite rough, a VERY clear influence of the gridding can be seen (see factor=1 and factor=10). To solve this, tomorrow I will do linear VF interpolation.
 
+## May 5th
+
+FOR VIKTORIA: Compare the two video files factor=10[_fine]. This should give you an idea of the problem I am trying to fix today.
+
+Yesterday I fixed a big error in how probabilities were handled. Phew. Today I want to fix a detail in which the vector field is handled. For performance purposes, I have allowed the vector field to be sampled at a lower density. Currently this is set at 8x (so that there is just 1 used per 64 available). As a result, the model displays a sort of 'gridding' in the simulation. This is due to the high factor (the influence along the axes scale fastest for the dominant direction- so a 45* flow at high factors might as well be orthogonal) in combination with this low resolution (In a finer grid, if every vector were only its strongest component, this result would be smaller. Because of each vector encompassing approx. a 8*0.05 degree side square area (approx 1600km²) they get caught in the dominant flow direction of this stream).
+To adress this issue, I will have to figure out what this factor should be. A linear interpolation should also help make this issue less apparent, as the flow a turtle then more precisely depends on its location. First, I am running the factor=10 example once more, but this time with the VF grid twice as fine. In doing this, I hope to see the gridding I discussed disappear.
 
 
 
-
-
+First thing today, I have added a function lonlat_to_meter, which I intend to use to limit the swim length of a turtle to a certain amount. Upon doing some analysis, I find the min stepsize is 76.6km/deg, maximum is 82.1km/deg. To accomodate for realistic swimming behaviour, I want the turtles to walk 2km/day. This is then achieved, at a stepsize of 0.005 deg in each direction, by making 5 steps. (Approx. math, 2/(80*0.005)). This means that in the minimum, the turtle 'underperforms' by swimming 1915m, and overperforms by swimming 2.053m. Close enough for my purposes.
 
 
 

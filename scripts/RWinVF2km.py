@@ -14,7 +14,7 @@ N_steps_per_timestep = 5 #Adds up to approx. 2km, but should get its own logic i
 N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
-startpos = np.array([-25.6, 44.4])
+startpos = np.array([-25.6, 44.4]) #lon(x), lat(y)
 initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
 horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
@@ -26,9 +26,9 @@ timeResolution = 24 # This is regardless of the multiples of 3 hours
 endTime = startTime + timeResolution*N_simulation_steps
 
 
-# Spatial dataset related stuff
-longitude_data_stepsize = 16 #Multiples of 0.04 degree
-latitude_data_stepsize  = 8 #Multiples of 0.08 degree
+# Spatial dataset related stuff. #lat and #long should be the same length, delta is used to accomodate for this.
+longitude_data_stepsize = 8 #Multiples of 0.04 degree
+latitude_data_stepsize  = 4 #Multiples of 0.08 degree
 delta = 8                   #For correcting size mismatch in latitudes/longitudes.
 
 ### END of options
