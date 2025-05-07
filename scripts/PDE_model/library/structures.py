@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.special import kn #Modified bessel function of order n
 
+
 class Node:
     def __init__(self, x_idx, y_idx, x_centre, y_centre, x_stepsize, y_stepsize, value=0.0):
         self.u_old = value
@@ -12,18 +13,28 @@ class Node:
         
         self.x_idx = x_idx
         self.y_idx = y_idx
+        self.dx = x_stepsize
+        self.dy = y_stepsize
         
-        self.neighbours = []
+        self.neighbours = [None, None, None, None]  # Order: [l, r, u, d]
+        self.diagonalNeighbours = [None, None, None, None]  # Order: [NE, NW, SE, SW]
         self.flux_sum = 0.0
         
         self.volume = x_stepsize * y_stepsize
         
         #Parameters for the tutel sim :D
-        self.swimspeed_s = 0.72
-        self.kappa = 1
-        self.swimdirection_V = np.array([0, -1])
-        self.D = 1
-        pass
+        self.swimtimePerDay = 2
+        self.swimspeed_s = 0.72*self.swimtimePerDay #km/day
+        self.kappa = 0.874
+        self.swimdirection_V = np.array([0.307, -0.952])
+        self.turningrate_mu = 50 #per day
+        
+        #Steps to construct D:
+        D_leftside = 0.5*(1-kn(2, self.kappa)/kn(0, self.kappa))*np.array([[1, 0], [0, 1]])
+        D_rightside = (kn(2, self.kappa)/kn(0, self.kappa)-(kn(1, self.kappa)/kn(0, self.kappa))**2)*np.array([[self.swimdirection_V[0]**2, self.swimdirection_V[0]*self.swimdirection_V[1]], [self.swimdirection_V[0]*self.swimdirection_V[1], self.swimdirection_V[1]**2]])
+        
+        #self.D = (self.swimspeed_s**2/self.turningrate_mu)*(D_leftside+D_rightside)
+        self.D = 0.001 * np.eye(2)
     
     def setValue(self, value):
         '''For initial conditions or flux flow-in.'''
@@ -31,6 +42,8 @@ class Node:
         
     def compute_advective_flux(self, edges):
         for neighbour in self.neighbours:
+            if neighbour is None: continue #Logic here for handling edge?
+            
             edge = Edge(self, neighbour)
             flux_advection = np.dot(edge.normal, self.swimspeed_s * (kn(1, self.kappa)/kn(0, self.kappa)) * self.swimdirection_V + edge.vectorFieldDirection) * (neighbour.u_old - self.u_old)
             #This flux is positive from 1->2. So 1 loses this amount, 2 will gain it when simulation comes.
@@ -38,17 +51,36 @@ class Node:
             
     def compute_diffusive_flux(self):
         '''Computes the diffusion flux for the node, based on the surrounding neighbours'''
-        for neighbour in self.neighbours:
-            # Compute the gradient of u between this node and its neighbour
-            grad_u = (neighbour.u_old - self.u_old) / np.linalg.norm(neighbour.position - self.position)
-            
-            # Compute the diffusion flux: F_diff = -D * grad(u)
-            flux_diffusion = self.D * grad_u
-            
-            # Add the diffusion flux contribution to the flux sums
-            self.flux_sum += flux_diffusion
-            
-            
+        # Order of neighbours: lrud
+        # Compute the gradient of u between this node and its neighbour
+        grad_u_x = (self.neighbours[0].u_old - 2*self.u_old + self.neighbours[1].u_old) / (self.dx**2)
+        grad_u_y = (self.neighbours[2].u_old - 2*self.u_old + self.neighbours[3].u_old) / (self.dy**2)
+        
+        d11 = self.D[0, 0]
+        d12 = self.D[0, 1]
+        d22 = self.D[1, 1]
+
+        #Second-order differences for Laplacian terms
+        d2u_dx2 = grad_u_x / (self.dx**2)
+        d2u_dy2 = grad_u_y / (self.dy**2)
+        
+        NE = self.diagonalNeighbours[0]
+        NW = self.diagonalNeighbours[1]
+        SE = self.diagonalNeighbours[2]
+        SW = self.diagonalNeighbours[3]
+
+        if None not in [NE, NW, SE, SW]:
+            d2u_dxdy = (NE.u_old - NW.u_old - SE.u_old + SW.u_old) / (4 * self.dx*self.dy)
+        else:
+            print("This happened!")
+            d2u_dxdy = 0.0  # Fallback if any diagonals are missing
+        
+        
+        # Full anisotropic diffusion operator
+        flux_diffusion = 2 * d12 * d2u_dxdy + d11 * d2u_dx2 + d22 * d2u_dy2
+        self.flux_sum += flux_diffusion
+
+        
             
 class Edge:
     '''An edge connects two nodes. It models the boundary BETWEEN these nodes. So the graphical representation will be CONFUSING! The graph edge would be drawn perpendicularly to the volume edge.'''
@@ -84,74 +116,112 @@ class Grid:
         self.x_num = 0
         self.y_num = 0
         self.edges = []
-        self.node_grid = {}  # Dictionary to access nodes by (i, j)
+        
+        self.all_nodes = []  # Includes ghost nodes
+        self.nodes = []      # Simulated (interior) nodes
+        self.node_grid = {}
 
-    def compute_fluxes(self):
+    def compute_fluxes(self, diffusive=True, advective=True):
         for node in self.nodes:
-            node.compute_advective_flux(self.edges)
-            node.compute_diffusive_flux()
-            
+            if advective:
+                node.compute_advective_flux(self.edges)
+            if diffusive:
+                node.compute_diffusive_flux()
+
     def update_nodes(self, dt):
         for node in self.nodes:
-            node.u_new=node.u_old + dt * (node.flux_sum / node.volume)
+            node.u_new = node.u_old + dt * (node.flux_sum / node.volume)
             node.flux_sum = 0.0
-    
+
     def swap_fields(self):
         for node in self.nodes:
             node.u_old = node.u_new
+
             
     def make_grid(self, x_length, y_length, dx, dy):
         nx = int(x_length / dx)
         ny = int(y_length / dy)
+
         self.x_num = nx
         self.y_num = ny
 
-        # Create nodes
-        for i in range(nx):
-            for j in range(ny):
+        # Expand bounds to include ghost nodes
+        for i in range(-1, nx + 1):
+            for j in range(-1, ny + 1):
                 x = i * dx + dx / 2
                 y = j * dy + dy / 2
                 node = Node(i, j, x, y, dx, dy)
-                self.nodes.append(node)
+                self.all_nodes.append(node)
                 self.node_grid[(i, j)] = node
 
-        # Create edges (bidirectional)
-        for i in range(nx):
-            for j in range(ny):
+                # Add only interior nodes to simulation
+                if 0 <= i < nx and 0 <= j < ny:
+                    self.nodes.append(node)
+
+
+        # Now connect neighbors
+        for i in range(-1, nx + 1):
+            for j in range(-1, ny + 1):
                 node = self.node_grid[(i, j)]
 
-                # Right neighbor
-                if i + 1 < nx:
+                # Initialize neighbor lists
+                node.neighbours = [None, None, None, None]
+                node.diagonalNeighbours = [None, None, None, None]
+
+                # Direct neighbors [l, r, u, d]
+                if (i - 1, j) in self.node_grid:
+                    neighbor = self.node_grid[(i - 1, j)]
+                    self.add_bidirectional_edge(node, neighbor)
+                    node.neighbours[0] = neighbor
+                    neighbor.neighbours[1] = node
+                    
+                if (i + 1, j) in self.node_grid:
                     neighbor = self.node_grid[(i + 1, j)]
                     self.add_bidirectional_edge(node, neighbor)
+                    node.neighbours[1] = neighbor
+                    neighbor.neighbours[0] = node
 
-                # Top neighbor
-                if j + 1 < ny:
+                if (i, j + 1) in self.node_grid:
                     neighbor = self.node_grid[(i, j + 1)]
                     self.add_bidirectional_edge(node, neighbor)
+                    node.neighbours[2] = neighbor
+                    neighbor.neighbours[3] = node
+
+                if (i, j - 1) in self.node_grid:
+                    neighbor = self.node_grid[(i, j - 1)]
+                    self.add_bidirectional_edge(node, neighbor)
+                    node.neighbours[3] = neighbor
+                    neighbor.neighbours[2] = node
+
+                
+                if (i + 1, j - 1) in self.node_grid:
+                    neighbor = self.node_grid[(i + 1, j - 1)]
+                    self.add_bidirectional_edge(node, neighbor)
+                    node.diagonalNeighbours[2] = neighbor  # SE
+
+                if (i - 1, j - 1) in self.node_grid:
+                    neighbor = self.node_grid[(i - 1, j - 1)]
+                    self.add_bidirectional_edge(node, neighbor)
+                    node.diagonalNeighbours[3] = neighbor  # SW
+
+                if (i + 1, j + 1) in self.node_grid:
+                    neighbor = self.node_grid[(i + 1, j + 1)]
+                    self.add_bidirectional_edge(node, neighbor)
+                    node.diagonalNeighbours[0] = neighbor  # NE
+
+                if (i - 1, j + 1) in self.node_grid:
+                    neighbor = self.node_grid[(i - 1, j + 1)]
+                    self.add_bidirectional_edge(node, neighbor)
+                    node.diagonalNeighbours[1] = neighbor  # NW
+                    
 
     def add_bidirectional_edge(self, node_a, node_b):
         edge_ab = Edge(node_a, node_b)
         edge_ba = Edge(node_b, node_a)
         self.edges.append(edge_ab)
         self.edges.append(edge_ba)
-
-        # Optional: add neighbors for node-based flux computations
-        node_a.neighbours.append(node_b)
-        node_b.neighbours.append(node_a)
-
-    def add_bidirectional_edge(self, node_a, node_b):
-        edge_ab = Edge(node_a, node_b)
-        edge_ba = Edge(node_b, node_a)
-        self.edges.append(edge_ab)
-        self.edges.append(edge_ba)
-
-        # Optional: add neighbors for node-based flux computations
-        node_a.neighbours.append(node_b)
-        node_b.neighbours.append(node_a)
         
     def make_plottable(self):
-        print(self.x_num, self.y_num)
         array = np.zeros([self.x_num, self.y_num])
         for i in range(self.x_num):
             for j in range(self.y_num):
