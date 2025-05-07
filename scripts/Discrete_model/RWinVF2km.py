@@ -9,7 +9,7 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_steps = 300 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
+N_simulation_steps = 50 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
 N_steps_per_timestep = 5 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
 N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
