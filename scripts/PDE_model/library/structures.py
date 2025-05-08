@@ -36,17 +36,29 @@ class Node:
         #self.D = (self.swimspeed_s**2/self.turningrate_mu)*(D_leftside+D_rightside)
         self.D = 0.001 * np.eye(2)
     
-    def setValue(self, value):
+    def addValue(self, value):
         '''For initial conditions or flux flow-in.'''
-        self.u_old = value
+        self.u_old += value
         
     def compute_advective_flux(self, edges):
         for neighbour in self.neighbours:
             if neighbour is None: continue #Logic here for handling edge?
             
             edge = Edge(self, neighbour)
-            flux_advection = np.dot(edge.normal, self.swimspeed_s * (kn(1, self.kappa)/kn(0, self.kappa)) * self.swimdirection_V + edge.vectorFieldDirection) * (neighbour.u_old - self.u_old)
-            #This flux is positive from 1->2. So 1 loses this amount, 2 will gain it when simulation comes.
+            
+            # Comput effective advection velocity through the face
+            face_velocity = self.swimspeed_s * (kn(1, self.kappa)/kn(0, self.kappa)) * self.swimdirection_V + edge.vectorFieldDirection
+            
+            normal_velocity = np.dot(edge.normal, face_velocity)
+            
+            if normal_velocity >= 0:
+                upwind_value = self.u_old
+            else:
+                upwind_value = neighbour.u_old
+            
+            flux_advection = normal_velocity * upwind_value
+            
+            #subtract the flux leaving this node.
             self.flux_sum -= flux_advection
             
     def compute_diffusive_flux(self):
@@ -111,11 +123,22 @@ class Edge:
         '''TODO: implement this'''
         
 class Grid:
-    def __init__(self):
+    def __init__(self, x_carthesian_range, y_carthesian_range):
+        '''
+        xy_carthesian_range are the range of coordinates. 
+        The Grid class works with indices internally, but the user interface is with coordinates.
+        '''
+        
         self.nodes = []
         self.x_num = 0
         self.y_num = 0
         self.edges = []
+        
+        self.x_range_max = max(x_carthesian_range)
+        self.x_range_min = min(x_carthesian_range)
+        self.y_range_max = max(y_carthesian_range)
+        self.y_range_min = min(y_carthesian_range)
+        
         
         self.all_nodes = []  # Includes ghost nodes
         self.nodes = []      # Simulated (interior) nodes
@@ -136,12 +159,36 @@ class Grid:
     def swap_fields(self):
         for node in self.nodes:
             node.u_old = node.u_new
-
             
-    def make_grid(self, x_length, y_length, dx, dy):
-        nx = int(x_length / dx)
-        ny = int(y_length / dy)
+    def add_value(self, i, j, value):
+        self.node_grid[(i, j)].addValue(value)
+        
+    def cti(self, x, y):
+        '''carthesian to index'''
+        dx = (self.x_range_max - self.x_range_min) / self.x_num
+        dy = (self.y_range_max - self.y_range_min) / self.y_num
+        
+        i = int((x - self.x_range_min - dx / 2) / dx)
+        j = int((y - self.y_range_min - dy / 2) / dy)
 
+        return (i, j)
+
+    
+    def itc(self, i, j):
+        '''index to carthesian'''
+        dx = (self.x_range_max - self.x_range_min) / self.x_num
+        dy = (self.y_range_max - self.y_range_min) / self.y_num
+        
+        x = self.x_range_min + i * dx + dx / 2
+        y = self.y_range_min + j * dy + dy / 2
+        
+        return (x, y)
+
+    
+    def make_grid(self, dx, dy):
+        nx = int((self.x_range_max - self.x_range_min) / dx)
+        ny = int((self.y_range_max - self.y_range_min) / dy)
+        
         self.x_num = nx
         self.y_num = ny
 
