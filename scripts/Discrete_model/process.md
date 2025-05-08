@@ -137,5 +137,8 @@ To adress this issue, I will have to figure out what this factor should be. A li
 
 First thing today, I have added a function lonlat_to_meter, which I intend to use to limit the swim length of a turtle to a certain amount. Upon doing some analysis, I find the min stepsize is 76.6km/deg, maximum is 82.1km/deg. To accomodate for realistic swimming behaviour, I want the turtles to walk 2km/day. This is then achieved, at a stepsize of 0.005 deg in each direction, by making 5 steps. (Approx. math, 2/(80*0.005)). This means that in the minimum, the turtle 'underperforms' by swimming 1915m, and overperforms by swimming 2.053m. Close enough for my purposes.
 
+## May 8th
 
+I have been working on the PDE model. I want to continue on the discrete model a little, too, as this one is still not finished. I currently need to dial in the influence of the vector field, and also make the turtles have an orientation. To achieve this, I want to re-weight the Von Mises distribution to LRUD, so that their expectation (and maybe variance?) add up to the same direction, and 1.
 
+I have decided to determine the individual walkers' probability of movement by taking an integral of the Von Mises distribution with parameters specified by Painter. This means that the probability of the agent moving in any direction should correspond in weight to the probability of the Von Mises going in a certain direction.

@@ -15,7 +15,7 @@ N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4]) #lon(x), lat(y)
-initial_probability = (0.25, 0.25, 0.25, 0.25) #lrud
+initial_probability = (0.174468, 0.28168, 0.09942134, 0.4444274) #lrud
 horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
 

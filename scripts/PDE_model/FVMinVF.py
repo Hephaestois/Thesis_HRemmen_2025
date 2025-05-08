@@ -10,8 +10,9 @@ end_time = 0.025
 starttime = time()
 dx, dy = 0.1, 0.1 #generally, dy = 3.6dx for a square grid.
 
+print("Starting process")
 grid.make_grid(dx, dy)
-print(grid.x_num)
+print("Finished making grid")
 grid.add_value(*grid.cti(-25, 44.5), 1)
 
 dt = 0.001
