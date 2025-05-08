@@ -48,10 +48,10 @@ def positionToIndex(vectorfield, lon, lat):
     lon_vals = vectorfield['longitude']
     
     # Check bounds
-    if not (lat_vals[0] <= lat <= lat_vals[-1]):
-        raise ValueError(f"Latitude {lat} is out of bounds.")
-    if not (lon_vals[0] <= lon <= lon_vals[-1]):
-        raise ValueError(f"Longitude {lon} is out of bounds.")
+    # if not (lat_vals[0] <= lat <= lat_vals[-1]):
+    #     raise ValueError(f"Latitude {lat} is out of bounds.")
+    # if not (lon_vals[0] <= lon <= lon_vals[-1]):
+    #     raise ValueError(f"Longitude {lon} is out of bounds.")
 
     # Interpolate lat index
     lat_idx = np.interp(lat, lat_vals, np.arange(len(lat_vals)))
