@@ -50,7 +50,7 @@ class Walker:
         TODO: Study how the parameter localFlowSpeed should be chosen for 'correct' performance. Currently =1 does not sound any mental alarms.
         '''
         # Correction factor for the localFlowSpeed, because of unit conversions. Currently unused (=1)
-        flowSpeedMultiplier = 1
+        flowSpeedMultiplier = 3
         walkerMultiplier = 1
         
         # The self.localFlow is a lrud vector of the flow components. There are two zeros, in the direction where the flow points away from.
