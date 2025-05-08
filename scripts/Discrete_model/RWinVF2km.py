@@ -1,5 +1,6 @@
 from library.agents import Walker
 from library.functions import zipCoords, progressBar
+from scipy.interpolate import RegularGridInterpolator
 import matplotlib.pyplot as plt
 import time
 import numpy as np
@@ -69,11 +70,22 @@ for simstep, t in enumerate(simulationTimes):
 
     progressBar(simstep, N_simulation_steps-1, start)    
 
-    # Searchsorted find the place t would be put to maintain order. 
+    # Searchsorted finds the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
     simulationTimeIndex = np.searchsorted(times, t)+startTimeIndex
-    vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]
-    vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]
+    
+    # Make the water grid linearly interpolatable
+    u_grid = dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]  # shape (lat, lon)
+    v_grid = dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]  # shape (lat, lon)
+    
+    # Interpolators assume input in the form (lat, lon)
+    u_interp = RegularGridInterpolator((lats_idx, lons_idx), u_grid, bounds_error=False, fill_value=None)
+    v_interp = RegularGridInterpolator((lats_idx, lons_idx), v_grid, bounds_error=False, fill_value=None)
+
+    # Now create a vector field dictionary with interpolators
+    vectorfield['water_u'] = u_interp
+    vectorfield['water_v'] = v_interp
+    
     
     for j, tutel in enumerate(Tutels):
         if tutel.finished:

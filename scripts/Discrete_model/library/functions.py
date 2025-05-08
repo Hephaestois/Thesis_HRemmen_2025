@@ -32,6 +32,33 @@ def findClosestIndex(vectorfield, lat, lon):
     closestLonIdx = np.argmin(np.abs(vectorfield['longitude']-lon))
     return [closestLonIdx, closestLatIdx]
     
+def positionToIndex(vectorfield, lon, lat):
+    """Interpolates a decimal grid index from a geographic position (lat, lon),
+    using the known lat/lon values from the NetCDF dataset.
+
+    Parameters:
+        vectorfield (dict): Contains 'latitude' and 'longitude' arrays.
+        lat (float): Latitude of the walker.
+        lon (float): Longitude of the walker.
+
+    Returns:
+        (float, float): (lon_index, lat_index) as decimal values.
+    """
+    lat_vals = vectorfield['latitude']
+    lon_vals = vectorfield['longitude']
+    
+    # Check bounds
+    if not (lat_vals[0] <= lat <= lat_vals[-1]):
+        raise ValueError(f"Latitude {lat} is out of bounds.")
+    if not (lon_vals[0] <= lon <= lon_vals[-1]):
+        raise ValueError(f"Longitude {lon} is out of bounds.")
+
+    # Interpolate lat index
+    lat_idx = np.interp(lat, lat_vals, np.arange(len(lat_vals)))
+    lon_idx = np.interp(lon, lon_vals, np.arange(len(lon_vals)))
+
+    return lon_idx, lat_idx 
+
 def progressBar(progress, max, start_time, bar_length=40):
     """
     Prints a dynamic progress bar with estimated time remaining.

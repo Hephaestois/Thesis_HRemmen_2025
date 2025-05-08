@@ -142,3 +142,7 @@ First thing today, I have added a function lonlat_to_meter, which I intend to us
 I have been working on the PDE model. I want to continue on the discrete model a little, too, as this one is still not finished. I currently need to dial in the influence of the vector field, and also make the turtles have an orientation. To achieve this, I want to re-weight the Von Mises distribution to LRUD, so that their expectation (and maybe variance?) add up to the same direction, and 1.
 
 I have decided to determine the individual walkers' probability of movement by taking an integral of the Von Mises distribution with parameters specified by Painter. This means that the probability of the agent moving in any direction should correspond in weight to the probability of the Von Mises going in a certain direction.
+This added term seems to increase the tutels awareness of direction, and also corrects the model's tendency for all of them to head upwards. Now I 'just' need to calibrate the flow strength and movement strenght so that the results in Painter are reproduced.
+
+I also want to make the vectorfield linearly interpolated
+
