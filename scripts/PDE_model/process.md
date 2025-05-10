@@ -15,3 +15,7 @@ Today I want to solve some issues with the PDE solver. Firstly, the advective te
 Has the flux issue been solved? Maybe. I have implemented a system to make the density u be nonnegative, by enforcing mass preservation. But its stability heavily depends on the time scale, and I am worried about how to reconcile time scale with spatial scale. I am also worried about the unit of the time scale. Some of my values so far have been in /day, which means 1 time would correspond to 1 day. At these resolutions, I can't seem to find a balance between performance and stability. Maybe I need to increase the order of my scheme to do this, but that would cost a lot of work.
 
 Before I worry about all that, I am going to include the vector field into the calculation, so that I can see some actual flow behaviour occurring. 
+
+# 10 May
+
+Today I am going to rewrite the PDE model into matrix form. More of a 'write' instead of 'rewrite', as I am going to start from scratch. Today (saturday) I want to implement the 'basic' logic elements (so constant A and D), tomorrow I want to implement the non-constant vector field. Monday is for finishing up shit left to do. First I will get the diffusion working, then the advection. This is to verify the basic results using a pure diffusion equation first, which is simpler to check. Here goes then ._.
