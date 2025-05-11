@@ -34,5 +34,10 @@ TODO For today:
  - Introduce advective BC's
  - Introduce the dependence on the vectorfield.
 
+So far, I have mostly fought and fought with indices. My carthesian is (lon, lat) or (x, y). But numpy VERY ANNOYINGLY (i am genuinely extremely upset right now) uses [j, i], if i<->x and j<->y. This has caused numerous errors because there is not one central place to handle this discrepancy, so I am in a sort of loop trying to find the bug and fixing it at one place, breaking it at the other. I am so done.
 
+I seem to have gotten the cti and itc stuff sort of working for grids where dx=/=dy, but with a caveat. Sometimes it just spits back an index out of bounds error, but only for specific values. This happens for example for 0.01, but not for 0.1 nor 0.03. So just, wiggle the dx and dy around until it stops complaining?
 
+I am now working on getting the advection working again, because it of course broke in the process.
+
+Advection appears to be working, but the directionality broke (it now just always points down-right, for some reason)
