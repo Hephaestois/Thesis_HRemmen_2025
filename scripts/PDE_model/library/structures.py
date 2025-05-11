@@ -69,9 +69,9 @@ class Grid:
             D[-1,-2] = 0
             
         if direction == "Horizontal":
-            self.diffusiveMatrix_x = D
+            self.diffusiveMatrix_x = D / (self.x_stepsize**2)
         if direction == "Vertical":
-            self.diffusiveMatrix_y = D
+            self.diffusiveMatrix_y = D / (self.y_stepsize**2)
             
     def precalculateAdvectiveMatrix(self):
         #TODO: advective matrix based on constant factors

@@ -7,13 +7,13 @@ from time import time
 
 x_range = [-29, -11]
 y_range = [42, 47]
-end_time = 2 #A lot?
+end_time = 1 #A lot?
 dx = 0.036 # 18/5 x 0.1. This makes the grid square (NxN), but the domain suffers for its non-equal resolution. Not so bad at high resolutions, though.
 dy = 0.01
 dt = 0.005
 
 grid = Grid(x_range, y_range, dx ,dy)
-grid.setDiffusionConstants(np.array([[1, 0], [0, 1]]))
+grid.setDiffusionConstants(np.array([[0.01, 0], [0, 0.01]]))
 grid.setAdvectionConstant(np.array([-2, 0]))
 grid.setTimestep(dt)
 
@@ -35,6 +35,9 @@ for i in grid.x_idxs:
         value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
         grid.setValue(grid.cti(x,y), value)
 ## End IC
+
+grid.setValue((0, 0), 1)
+
 
 
 N_steps = int(end_time/dt)
