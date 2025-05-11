@@ -21,3 +21,11 @@ Before I worry about all that, I am going to include the vector field into the c
 Today I am going to rewrite the PDE model into matrix form. More of a 'write' instead of 'rewrite', as I am going to start from scratch. Today (saturday) I want to implement the 'basic' logic elements (so constant A and D), tomorrow I want to implement the non-constant vector field. Monday is for finishing up shit left to do. First I will get the diffusion working, then the advection. This is to verify the basic results using a pure diffusion equation first, which is simpler to check. Here goes then ._.
 
 End of day: I have implemented the diffusion successfully. I have skipped the diagonal terms for now, but they might go unused anyway, so why bother. The advection seems to work somewhat, but when I turn the arguments negative, I see weird stuff in the wrong direction. This is proabbly some flaw in my logic which I'm going to fix tomorrow / later tonight
+
+# 11 May
+
+Today, its time to get advection working. It (seems to) work, but only when the coefficients in A are positive. When negative, the advection still goes in the positive direction, and starts to checkerboard really hard.
+
+The first fix I want to do, is to make the constant advection working. To do this, I am going to use a first-order upwind scheme.
+
+

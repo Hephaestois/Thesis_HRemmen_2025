@@ -40,11 +40,14 @@ class Grid:
         self.diffusionConstants = D
         
     def setAdvectionConstant(self, A):
-        print(A[0], A[1])
-        self.advectionConstants = A
+        # Change is necessary to make format readable for humans: necessity comes from difference between (x,y) and  (i,j) in matrix form!
+        self.advectionConstants = np.array([A[1], A[0]])
     
     def setValue(self, pos, value):
         self.u_old[pos] = value
+    
+    def addValue(self, pos, value):
+        self.u_old[pos] += value
     
     def setTimestep(self, timestep):
         self.dt = timestep
@@ -71,15 +74,22 @@ class Grid:
             self.diffusiveMatrix_y = D
             
     def precalculateAdvectiveMatrix(self):
-        Ax = np.zeros((self.x_num, self.x_num))
-        np.fill_diagonal(Ax, -1)
-        np.fill_diagonal(Ax[:,1:], 1)
-        self.advectiveMatrix_x = Ax * self.advectionConstants[0]
+        #TODO: advective matrix based on constant factors
+        A_x = np.zeros((self.x_num,self.y_num))
+        A_y = np.zeros((self.x_num,self.y_num))
         
-        Ay = np.zeros((self.y_num, self.y_num))
-        np.fill_diagonal(Ay, -1)
-        np.fill_diagonal(Ay[:,1:], 1)
-        self.advectiveMatrix_y = Ay * self.advectionConstants[1]
+        np.fill_diagonal(A_x, 1)
+        np.fill_diagonal(A_x[1:], -1)
+        np.fill_diagonal(A_y, 1)
+        np.fill_diagonal(A_y[:,1:], -1)
+        
+        if self.advectionConstants[0] < 0:
+            A_x = -np.transpose(A_x)
+        if self.advectionConstants[1] < 0:
+            A_y = -np.transpose(A_y)
+        
+        self.advectiveMatrix_x = -self.advectionConstants[0] * A_x / self.y_stepsize
+        self.advectiveMatrix_y = -self.advectionConstants[1] * A_y / self.x_stepsize
                 
     def timeStep(self, diffusion=True, advection=True):
         self.u_new = self.u_old
@@ -100,6 +110,7 @@ class Grid:
             
             LHS_adv = np.matmul(A_x, self.u_old)
             RHS_adv = np.matmul(self.u_old, A_y)
+            
             self.u_new += self.dt * (LHS_adv + RHS_adv)
             
             
