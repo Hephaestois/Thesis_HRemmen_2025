@@ -27,5 +27,14 @@ End of day: I have implemented the diffusion successfully. I have skipped the di
 Today, its time to get advection working. It (seems to) work, but only when the coefficients in A are positive. When negative, the advection still goes in the positive direction, and starts to checkerboard really hard.
 
 The first fix I want to do, is to make the constant advection working. To do this, I am going to use a first-order upwind scheme.
+The advection now seems to work. It still needs to have the boundary conditions added, and I am doubting the way I approach the creation of A itself right now. Especially because I would like my grid to be rectangular, but with square volumes (they are now rectangular to make the grid square). For this change, my matrices need to be NxM, whereas they are all NxN right now. It should luckily not be a too huge change.
+
+TODO For today:
+ Before 6PM:
+ - Allow a square grid
+ - Introduce advective BC's
+ After 6PM:
+ - Introduce the dependence on the vectorfield.
+
 
 
