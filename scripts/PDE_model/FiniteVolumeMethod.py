@@ -23,7 +23,7 @@ grid.precalculateAdvectiveMatrix()
 
 
 ## IC: Gaussian
-A = 0.1
+A = 1
 x0 = (-25)
 y0 = (44.5)
 sigma_x = 1
