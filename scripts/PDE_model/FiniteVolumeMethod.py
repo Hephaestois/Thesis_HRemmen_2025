@@ -8,13 +8,13 @@ from time import time
 x_range = [-29, -11]
 y_range = [42, 47]
 end_time = 1 #A lot?
-dx = 0.1 # 18/5 x 0.1. This makes the grid square (NxN), but the domain suffers for its non-equal resolution. Not so bad at high resolutions, though.
-dy = 0.1
+dx = 0.03 # 18/5 x 0.1. This makes the grid square (NxN), but the domain suffers for its non-equal resolution. Not so bad at high resolutions, though.
+dy = 0.03
 dt = 0.001
 
 grid = Grid(x_range, y_range, dx ,dy)
 grid.setDiffusionConstants(np.array([[0.01, 0], [0, 0.01]]))
-grid.setAdvectionConstant(np.array([-0.2, 1]))
+grid.setAdvectionConstant(np.array([1, 1]))
 grid.setTimestep(dt)
 
 grid.precalculateDiffusiveMatrix(type="Neumann", direction="Horizontal")
@@ -38,7 +38,7 @@ grid.precalculateAdvectiveMatrix()
 #         grid.addValue(grid.cti(x, y), value)
 # ## End IC
 
-grid.addValue(grid.cti(-25, 44.5), 40)
+grid.addValue(grid.cti(-25, 44.5), 120)
 
 N_steps = int(end_time/dt)
 start_time = time()
@@ -46,6 +46,9 @@ start_time = time()
 for i in range(N_steps):
     progressBar(i, N_steps-1, start_time, comment=grid.getTotalValue())
     grid.timeStep(diffusion=False, advection=True)
+
+grid.addValue(grid.cti(-25, 44.5), 120)
+
 
 print('Overflow Ratio ', grid.getOverflowRatio())
 

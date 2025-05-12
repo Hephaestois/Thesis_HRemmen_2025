@@ -42,7 +42,7 @@ class Grid:
         
     def setAdvectionConstant(self, A):
         # Change is necessary to make format readable for humans: necessity comes from difference between (x,y) and  (i,j) in matrix form!
-        self.advectionConstants = A
+        self.advectionConstants = np.array([A[1],A[0]])
     
     def setValue(self, pos, value):
         self.u_old[pos] = value
@@ -84,24 +84,20 @@ class Grid:
             self.diffusiveMatrix_y = D
             
     def precalculateAdvectiveMatrix(self):
-        N_y, N_x = self.y_num, self.x_num
+        N_y, N_x = self.x_num, self.y_num
 
         # 1D backward-difference operator
         def backward_diff_matrix(N):
             A = np.zeros((N, N))
             np.fill_diagonal(A, 1)
-            np.fill_diagonal(A[:, 1:], -1)
+            np.fill_diagonal(A[1:], -1)
             return A
 
         A_y = backward_diff_matrix(N_y)
         A_x = backward_diff_matrix(N_x)
 
-        # Handle direction signs
-        if self.advectionConstants[1] < 0:
-            A_y = -A_y
-        if self.advectionConstants[0] < 0:
-            A_x = -A_x
-
+        
+        
         self.advectiveMatrix_x = self.advectionConstants[0] * A_x / self.x_stepsize  # operates on x (columns)
         self.advectiveMatrix_y = self.advectionConstants[1] * A_y / self.y_stepsize  # operates on y (rows)
 
@@ -122,8 +118,8 @@ class Grid:
             A_x = self.advectiveMatrix_x
             A_y = self.advectiveMatrix_y
             
-            LHS_adv = np.matmul(A_y, self.u_old)
-            RHS_adv = np.matmul(self.u_old, A_x)
+            LHS_adv = np.matmul(self.u_old, A_y)
+            RHS_adv = np.matmul(A_x, self.u_old)
             
             self.u_new -= self.dt * (LHS_adv + RHS_adv)
             
