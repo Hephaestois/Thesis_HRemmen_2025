@@ -42,7 +42,7 @@ class Grid:
         
     def setAdvectionConstant(self, A):
         # Change is necessary to make format readable for humans: necessity comes from difference between (x,y) and  (i,j) in matrix form!
-        self.advectionConstants = np.array([A[1],A[0]])
+        self.advectionConstants = np.array([A[1],-A[0]])
     
     def setValue(self, pos, value):
         self.u_old[pos] = value
@@ -84,22 +84,28 @@ class Grid:
             self.diffusiveMatrix_y = D
             
     def precalculateAdvectiveMatrix(self):
-        N_y, N_x = self.x_num, self.y_num
+        N_y, N_x = self.x_num, self.y_num #These are intentionally swapped! Due to the side of u on which the operator needs to be applied. This is correct, don't worry about it Hazel
 
-        # 1D backward-difference operator
-        def backward_diff_matrix(N):
+        # 1D advection operator: backward- or forward difference depending on the sign.
+        def advection_operator(N, advectionDirection):
             A = np.zeros((N, N))
-            np.fill_diagonal(A, 1)
-            np.fill_diagonal(A[1:], -1)
-            return A
+            
+            if advectionDirection >= 0:
+                np.fill_diagonal(A, 1)
+                np.fill_diagonal(A[1:], -1) #below diagonal
+            else:
+                np.fill_diagonal(A, -1)
+                np.fill_diagonal(A[:, 1:], 1) #above diagonal
+            
+            return A * advectionDirection
 
-        A_y = backward_diff_matrix(N_y)
-        A_x = backward_diff_matrix(N_x)
-
+        A_x = advection_operator(N_x, self.advectionConstants[0])
+        A_y = advection_operator(N_y, self.advectionConstants[1])
         
         
-        self.advectiveMatrix_x = self.advectionConstants[0] * A_x / self.x_stepsize  # operates on x (columns)
-        self.advectiveMatrix_y = self.advectionConstants[1] * A_y / self.y_stepsize  # operates on y (rows)
+        
+        self.advectiveMatrix_x = A_x / self.x_stepsize  # operates on x (columns)
+        self.advectiveMatrix_y = A_y / self.y_stepsize  # operates on y (rows)
 
                 
     def timeStep(self, diffusion=True, advection=True):

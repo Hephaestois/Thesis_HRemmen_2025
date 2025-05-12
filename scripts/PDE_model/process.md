@@ -41,3 +41,9 @@ I seem to have gotten the cti and itc stuff sort of working for grids where dx=/
 I am now working on getting the advection working again, because it of course broke in the process.
 
 Advection appears to be working, but the directionality broke (it now just always points down-right, for some reason)
+
+# 12 may
+
+Today I have spent most of my day writing parts of text in the Overleaf. I have also spent part of the morning fixing up my advection code. I have run through the math of forward differences again, as it was a MESS. It is currently 11:24PM and by god will I not sleep before I have advection working in every direction. Currently the advection only works when the scalars are positive, and I know why this is and how to fix. When it becomes negative, I need to compensate for that by changing my differentiation scheme. This is to ensure that I am doing my advection in the direction of the flow. If I don't do this, I do not get a numerically stable scheme.
+
+I did not expect to be done after 9 minutes, but it works now. I suppose I will spend some extra time on boundary conditions now.
