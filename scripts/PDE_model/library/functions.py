@@ -4,7 +4,7 @@ import sys
 import time
 import random
 
-def progressBar(progress, max, start_time, bar_length=40, comment=False):
+def progressBar(progress, max, start_time, bar_length=40, comment=False, commentMessage=''):
     """
     Prints a dynamic progress bar with estimated time remaining.
 
@@ -35,7 +35,7 @@ def progressBar(progress, max, start_time, bar_length=40, comment=False):
         f"{percent * 100:.1f}% | Elapsed: {elapsed_str} | ETA: {remaining_str}"
     )
     if comment:
-        text += f" | Comment: {comment}"
+        text += f" | {commentMessage}: {str(comment)[:10]}"
     
     sys.stdout.write(text)
     sys.stdout.flush()

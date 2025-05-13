@@ -70,7 +70,11 @@ After the meeting, I have the following points:
  - To determine which numerical integration method to use in different places of the matrix: np.where to determine whether to use forward/backward difference. Filter matrix on in this way.
  - Mark parts of the overleaf text for Viktoria to judge.
 
-I will start with the np.where thing, as I really appreaciate the way it solves my previous problem of handling my numerical scheme: originally, if the flow direction was negative, I would change the scheme to account for the reversed direction of flow, but now I will just apply both schemes, but only to the parts where the flow is positive resp. negative. To start the implementation, I want to rewrite the constant advection to not use conditionals: 
+I will start with the np.where thing, as I really appreaciate the way it solves my previous problem of handling my numerical scheme: originally, if the flow direction was negative, I would change the scheme to account for the reversed direction of flow, but now I will just apply both schemes, but only to the parts where the flow is positive resp. negative. 
+
+Hazel from the past future, now the now: The change has been successful. I was hanting a bug at some point which was just me not removing old code, so some simulation part was running twice. That is now fixed, and the changes have been implemented. I think it is possible to add the constant and nonconstant parts together, but I will wait with doing that until I have gotten the nonconstant VF into the simulation. For now, the resolutions seem to scale in a feasible manner: using grid sizes of 0.012 degrees (so 10x higher resolution than the flow data, coming in at 1.2km per stepsize) and dt of 0.01, a period of 14.4 minutes, simulating a full day takes 13 seconds. This means that at this scale, simulating the entire suite will take 3900 seconds or 1 hour and 15 minutes. Reducing the resolution can drastically increase this, but the download time for data is also a factor to consider. 
+
+
 
 
 

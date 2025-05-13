@@ -106,7 +106,6 @@ class Grid:
         self.advectiveUpwindOperator_y = advection_operator(N_y, 1) / self.y_stepsize
         self.advectiveDownwindOperator_y = advection_operator(N_y, -1) / self.y_stepsize
         
-        
     def precalculateAdvectiveOperatorVF(self):
         #Similar to precalcAdvectiveOperator
         N_y, N_x = self.x_num, self.y_num #Intentionally swapped!
@@ -129,8 +128,8 @@ class Grid:
         # VF_x = np.abs(np.random.rand(50, 180))
         # VF_y = np.abs(np.random.rand(50, 180))
         
-        VF_x = np.ones((50, 180))
-        VF_y = np.ones((50, 180))
+        VF_x = np.random.rand(self.y_num, self.x_num)-0.5
+        VF_y = np.random.rand(self.y_num, self.x_num)-0.5
         
         self.vectorfield_x = VF_x
         self.vectorfield_y = VF_y
@@ -174,8 +173,10 @@ class Grid:
             
             # The elementwise product of A*u, to use in np.where. 
             # Here A is just the advection constants, in VF, it would be vectorfield_x with np.multiply
-            au_x = np.multiply(self.vectorfield_x, self.u_old)
-            au_y = np.multiply(self.vectorfield_y, self.u_old)
+            
+            # The order of the vectorfields here is weird to permit the function setVectorField to work intuitively.
+            au_x = np.multiply(self.vectorfield_y, self.u_old)
+            au_y = np.multiply(-self.vectorfield_x, self.u_old)
             
             LHS_1_adv = np.matmul(A_x_up, np.where(au_x>=0, au_x, 0))
             LHS_2_adv = np.matmul(A_x_down, np.where(au_x<0, au_x, 0))
@@ -184,14 +185,14 @@ class Grid:
             
             self.u_new -= self.dt * (LHS_1_adv + LHS_2_adv + RHS_1_adv + RHS_2_adv)
 
-        if VFAdvection:
-            A_x = self.advectiveOperatorVF_x
-            A_y = self.advectiveOperatorVF_y
+        # if VFAdvection:
+        #     A_x = self.advectiveOperatorVF_x
+        #     A_y = self.advectiveOperatorVF_y
                         
-            LHS_adv_VF = np.matmul(A_x, np.multiply(self.vectorfield_x, self.u_old))
-            RHS_adv_VF = np.matmul(np.multiply(self.vectorfield_y, self.u_old), A_y)
+        #     LHS_adv_VF = np.matmul(A_x, np.multiply(self.vectorfield_x, self.u_old))
+        #     RHS_adv_VF = np.matmul(np.multiply(self.vectorfield_y, self.u_old), A_y)
             
-            self.u_new -= self.dt * (LHS_adv_VF+RHS_adv_VF)
+        #     self.u_new -= self.dt * (LHS_adv_VF+RHS_adv_VF)
         
         #Absorbing boundaries:
         self.overflow_top += np.sum(self.u_new[-1, :])
