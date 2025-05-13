@@ -47,3 +47,31 @@ Advection appears to be working, but the directionality broke (it now just alway
 Today I have spent most of my day writing parts of text in the Overleaf. I have also spent part of the morning fixing up my advection code. I have run through the math of forward differences again, as it was a MESS. It is currently 11:24PM and by god will I not sleep before I have advection working in every direction. Currently the advection only works when the scalars are positive, and I know why this is and how to fix. When it becomes negative, I need to compensate for that by changing my differentiation scheme. This is to ensure that I am doing my advection in the direction of the flow. If I don't do this, I do not get a numerically stable scheme.
 
 I did not expect to be done after 9 minutes, but it works now. I suppose I will spend some extra time on boundary conditions now.
+
+# 13 may
+
+Today I should start with boundary conditions, but I want to start with the non constant advection math. This I will do on paper, so just a moment while I do that :D
+
+I have reached a conclusion about how to determine the flux from the field. LUCKILY it is still matrix calculations, just with a flux modification determined by the flow field. Letting a_x and a_y denote the components of the vectorfield so that A(x,t)=(a_x(x,t), a_y(x,t)) then we can rewrite u_t=div(Au) as 
+u_t = del_x (a_x * u) + del_y (a_y * u)
+Where a_x * u is elementwise multiplication, as a_x acts as scalars for each element of u. Then we apply the del_X and del_y operators in the same way as in the constant vector field.
+
+The hard part then is getting the data into python. For this I want to use the follow 'process' (pipeline?):
+- Get data once per simstep (This is not once per timestep, the timestep is smaller than simstep for resolution purposes)
+- Use scipy to linearly interpolate this data, so that it is transformed from the gridpoints HYCOM uses to the gridpoints my density function uses.  (Once per simstep)
+- Use this data for every timestep in a simstep. 
+- Repeat
+
+The first two of these steps will be wrapped in the grid.getVectorField function, which sets scipy linearInterpolate functions mapping (x,y) (or i,j?)->water_u or water_v, respectively. These are then applied inside grid.getVectorField to get two grids self.water_u and self.water_v which are on the exact same grid as self.u_old. 
+
+
+
+
+
+
+
+
+
+
+
+
