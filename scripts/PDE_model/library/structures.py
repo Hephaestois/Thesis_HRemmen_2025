@@ -26,11 +26,12 @@ class Grid:
         # d_xx, d_yy operators. x_shape by y_shape matrixes!
         self.diffusiveOperator_x = np.zeros((self.y_num, self.y_num))
         self.diffusiveOperator_y = np.zeros((self.x_num, self.x_num))
-        self.advectiveOperator_x = np.zeros((self.x_num, self.y_num))
-        self.advectiveOperator_y = np.zeros((self.x_num, self.y_num))
         self.advectiveOperatorVF_x = np.zeros((self.x_num, self.y_num))
         self.advectiveOperatorVF_y = np.zeros((self.x_num, self.y_num))
-        
+        self.advectiveUpwindOperator_x = np.zeros((self.x_num, self.y_num))
+        self.advectiveDownwindOperator_x = np.zeros((self.x_num, self.y_num))
+        self.advectiveUpwindOperator_y = np.zeros((self.x_num, self.y_num))
+        self.advectiveDownwindOperator_y = np.zeros((self.x_num, self.y_num))
         
         # For absorbing boundaries
         self.overflow_top = 0
@@ -89,8 +90,8 @@ class Grid:
 
         # 1D advection operator: backward- or forward difference depending on the sign.
         def advection_operator(N, advectionDirection):
-            A = np.zeros((N, N))
-            
+            A = np.zeros((N,N))
+            #advectiondirection >0: upwind, <0: downwind
             if advectionDirection >= 0:
                 np.fill_diagonal(A, 1)
                 np.fill_diagonal(A[1:], -1) #below diagonal
@@ -98,13 +99,13 @@ class Grid:
                 np.fill_diagonal(A, -1)
                 np.fill_diagonal(A[:, 1:], 1) #above diagonal
             
-            return A * advectionDirection
-
-        A_x = advection_operator(N_x, self.advectionConstants[0])
-        A_y = advection_operator(N_y, self.advectionConstants[1])
+            return A
         
-        self.advectiveOperator_x = A_x / self.x_stepsize  # operates on x (columns)
-        self.advectiveOperator_y = A_y / self.y_stepsize  # operates on y (rows)
+        self.advectiveUpwindOperator_x = advection_operator(N_x, 1) / self.x_stepsize  # operates on x (columns)
+        self.advectiveDownwindOperator_x = advection_operator(N_x, -1) / self.x_stepsize
+        self.advectiveUpwindOperator_y = advection_operator(N_y, 1) / self.y_stepsize
+        self.advectiveDownwindOperator_y = advection_operator(N_y, -1) / self.y_stepsize
+        
         
     def precalculateAdvectiveOperatorVF(self):
         #Similar to precalcAdvectiveOperator
@@ -125,14 +126,14 @@ class Grid:
     def getVectorField(self, source, simStep):
         dataset = netCDF4.Dataset(source)
         
-        VF_x = np.zeros((50, 180))
+        # VF_x = np.abs(np.random.rand(50, 180))
+        # VF_y = np.abs(np.random.rand(50, 180))
+        
+        VF_x = np.ones((50, 180))
         VF_y = np.ones((50, 180))
         
         self.vectorfield_x = VF_x
         self.vectorfield_y = VF_y
-        
-        print(VF_x)
-        pass
                 
     def timeStep(self, diffusion=True, constantAdvection=True, VFAdvection=True):
         self.u_new = self.u_old
@@ -147,13 +148,41 @@ class Grid:
             self.u_new += self.dt * (LHS_diff + RHS_diff)
         
         if constantAdvection:
-            A_x = self.advectiveOperator_x
-            A_y = self.advectiveOperator_y
+            A_x_up = self.advectiveUpwindOperator_x
+            A_x_down = self.advectiveDownwindOperator_x
+            A_y_up = self.advectiveUpwindOperator_y
+            A_y_down = self.advectiveDownwindOperator_y
             
-            LHS_adv = np.matmul(A_x, self.u_old)
-            RHS_adv = np.matmul(self.u_old, A_y)
+            # The elementwise product of A*u, to use in np.where. 
+            # Here A is just the advection constants, in VF, it would be vectorfield_x with np.multiply
+            au_x = self.advectionConstants[0]*self.u_old
+            au_y = self.advectionConstants[1]*self.u_old
             
-            self.u_new -= self.dt * (LHS_adv + RHS_adv)
+            LHS_1_adv = np.matmul(A_x_up, np.where(au_x>=0, au_x, 0))
+            LHS_2_adv = np.matmul(A_x_down, np.where(au_x<0, au_x, 0))
+            RHS_1_adv = np.matmul(np.where(au_y>=0, au_y, 0), A_y_up)
+            RHS_2_adv = np.matmul(np.where(au_y<0, au_y, 0), A_y_down)
+            
+            self.u_new -= self.dt * (LHS_1_adv + LHS_2_adv + RHS_1_adv + RHS_2_adv)
+        
+        if VFAdvection:
+            # This should be very similar!
+            A_x_up = self.advectiveUpwindOperator_x
+            A_x_down = self.advectiveDownwindOperator_x
+            A_y_up = self.advectiveUpwindOperator_y
+            A_y_down = self.advectiveDownwindOperator_y
+            
+            # The elementwise product of A*u, to use in np.where. 
+            # Here A is just the advection constants, in VF, it would be vectorfield_x with np.multiply
+            au_x = np.multiply(self.vectorfield_x, self.u_old)
+            au_y = np.multiply(self.vectorfield_y, self.u_old)
+            
+            LHS_1_adv = np.matmul(A_x_up, np.where(au_x>=0, au_x, 0))
+            LHS_2_adv = np.matmul(A_x_down, np.where(au_x<0, au_x, 0))
+            RHS_1_adv = np.matmul(np.where(au_y>=0, au_y, 0), A_y_up)
+            RHS_2_adv = np.matmul(np.where(au_y<0, au_y, 0), A_y_down)
+            
+            self.u_new -= self.dt * (LHS_1_adv + LHS_2_adv + RHS_1_adv + RHS_2_adv)
 
         if VFAdvection:
             A_x = self.advectiveOperatorVF_x
