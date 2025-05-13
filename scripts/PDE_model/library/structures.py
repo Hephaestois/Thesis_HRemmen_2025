@@ -125,11 +125,13 @@ class Grid:
     def getVectorField(self, source, simStep):
         dataset = netCDF4.Dataset(source)
         
-        VF_x = np.random.rand(50, 180)
-        VF_y = np.random.rand(50, 180)
+        VF_x = np.zeros((50, 180))
+        VF_y = np.ones((50, 180))
         
         self.vectorfield_x = VF_x
         self.vectorfield_y = VF_y
+        
+        print(VF_x)
         pass
                 
     def timeStep(self, diffusion=True, constantAdvection=True, VFAdvection=True):
@@ -167,8 +169,8 @@ class Grid:
         self.overflow_bottom += np.sum(self.u_new[0, :])
         
         #Remove value at the overflow boundary
-        self.u_new[0, :] = 0
-        self.u_new[-1, :] = 0
+        # self.u_new[0, :] = 0
+        # self.u_new[-1, :] = 0
         
         self.u_old = self.u_new
         
