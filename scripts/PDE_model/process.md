@@ -64,7 +64,13 @@ The hard part then is getting the data into python. For this I want to use the f
 
 The first two of these steps will be wrapped in the grid.getVectorField function, which sets scipy linearInterpolate functions mapping (x,y) (or i,j?)->water_u or water_v, respectively. These are then applied inside grid.getVectorField to get two grids self.water_u and self.water_v which are on the exact same grid as self.u_old. 
 
+# Meeting 13-05
+After the meeting, I have the following points:
+ - 'Ignore' the mass that leaves the area, or at least don't set it to zero. Add the mass which leaves to a counter. 
+ - To determine which numerical integration method to use in different places of the matrix: np.where to determine whether to use forward/backward difference. Filter matrix on in this way.
+ - Mark parts of the overleaf text for Viktoria to judge.
 
+I will start with the np.where thing, as I really appreaciate the way it solves my previous problem of handling my numerical scheme: originally, if the flow direction was negative, I would change the scheme to account for the reversed direction of flow, but now I will just apply both schemes, but only to the parts where the flow is positive resp. negative. To start the implementation, I want to rewrite the constant advection to not use conditionals: 
 
 
 
