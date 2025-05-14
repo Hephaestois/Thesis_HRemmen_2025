@@ -4,54 +4,105 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 from time import time
+import netCDF4
 
+### Related to constants
+diffusionMatrix = [[1, 0], [0, 1]] #Is converted to NParray later.
+advectionVector = [0.1, 0] #Converted to NP later. Constant behaviour.
+
+
+### Related to integration domain
 x_range = [-29, -11]
 y_range = [42, 47]
-end_time = 1 #A lot?
-dx = 0.012 # 18/5 x 0.1. This makes the grid square (NxN), but the domain suffers for its non-equal resolution. Not so bad at high resolutions, though.
-dy = 0.012
-dt = 0.01
+dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
+dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
+dt = 0.0005 # timestep between dataset swapping. scale: day.
+
+
+### Related to dataset time and VF
+startTime = 131496      #Hours since 01-01-2000. This repr. 01-01-2015
+timeResolution = 24     #Hours between dataset snapshots. Intermediate timesteps use identical set.
+simLengthDays = 1
+endTime = startTime + timeResolution * simLengthDays
 
 url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3'
+# No spatial resolution for the dataset is necessary; it is interpolated to fit to the grid size.
 
+### Start simulation related stuff
 
 grid = Grid(x_range, y_range, dx ,dy)
-grid.setDiffusionConstants(np.array([[1, 0], [0, 1]]))
-grid.setAdvectionConstant(np.array([0.1, 0]))
+grid.setDiffusionConstants(np.array(diffusionMatrix))
+grid.setAdvectionConstant(np.array(advectionVector))
 grid.setTimestep(dt)
 
 grid.precalculateDiffusiveOperator(type="Neumann", direction="Horizontal")
 grid.precalculateDiffusiveOperator(type="Neumann", direction="Vertical")
 grid.precalculateAdvectiveOperator()
-grid.precalculateAdvectiveOperatorVF()
-grid.getVectorField(url, 0)
 
 # ## IC: Gaussian
-A = 1
-x0 = (-25)
-y0 = (44.5)
-sigma_x = 1
-sigma_y = 1
+# A = 1
+# x0 = (-25)
+# y0 = (44.5)
+# sigma_x = 1
+# sigma_y = 1
 
-for i in grid.x_idxs:
-    for j in grid.y_idxs:
-        x,y = grid.itc(j, i)
-        value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
-        grid.addValue(grid.cti(*grid.itc(j, i)), value)
+# for i in grid.x_idxs:
+#     for j in grid.y_idxs:
+#         x,y = grid.itc(j, i)
+#         value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
+#         grid.addValue(grid.cti(*grid.itc(j, i)), value)
 # ## End IC
 
 # ## IC: point mass
 
-# grid.addValue(grid.cti(-25, 44.5), 10)
+grid.addValue(grid.cti(-25, 44.5), 10)
 
 # ## End IC
 
-N_steps = int(end_time/dt)
+dataset = netCDF4.Dataset(url)
+# times = [j for j in [i for i in dataset.variables['time'][:] if i >= startTime] if j <= endTime]
+# longitudes = [j for j in [i for i in dataset.variables['lon'][:] if i >= min(x_range)] if j <= max(x_range)]
+# latitudes = [j for j in [i for i in dataset.variables['lat'][:] if i >= min(y_range)] if j <= max(y_range)]
+
+# Original arrays
+time_array = dataset.variables['time'][:]
+lon_array = dataset.variables['lon'][:]
+lat_array = dataset.variables['lat'][:]
+
+
+# Time indices and values
+time_mask = (time_array >= startTime) & (time_array <= endTime)
+time_idx = np.where(time_mask)[0]
+times = time_array[time_idx]
+startTimeIndex = list(time_array).index(startTime)
+
+# Longitude indices and values
+lon_mask = (lon_array >= min(x_range)) & (lon_array <= max(x_range))
+lon_idx = np.where(lon_mask)[0]
+longitudes = lon_array[lon_idx]
+
+# Latitude indices and values
+lat_mask = (lat_array >= min(y_range)) & (lat_array <= max(y_range))
+lat_idx = np.where(lat_mask)[0]
+latitudes = lat_array[lat_idx]
+grid.setLonLatVals(dataset, lon_idx, lat_idx)
+
+N_steps_per_day = int(1/dt)
 start_time = time()
 
-for i in range(N_steps):
-    progressBar(i, N_steps-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
-    grid.timeStep(diffusion=False, constantAdvection=True, VFAdvection=True)
+for i in range(simLengthDays):
+    simTime = startTime + i*timeResolution #Hours since 2000
+    simTimeIndex = np.searchsorted(times, simTime) + startTimeIndex #To access dataset
+    
+    grid.getVectorField(dataset, lat_idx, lon_idx, simTimeIndex) #At the start of every 24 hours.
+    
+    for j in range(N_steps_per_day):
+        grid.timeStep(diffusion=True, constantAdvection=True, VFAdvection=True)
+        progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
+
+    
+    
+    
 
 print('Overflow Ratio:', grid.getOverflowRatio())
 print('Overflow through bottom:', grid.getOverflowBottom())

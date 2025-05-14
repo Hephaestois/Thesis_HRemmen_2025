@@ -43,6 +43,7 @@ lats_idx = range(2050,2176-delta,latitude_data_stepsize)
 
 # These three are pretty important, as they are used to precompute some stuff, best saved locally
 longitudes = dataset.variables['lon'][lons_idx] # Range -29.2, -11.28
+print(longitudes)
 latitudes = dataset.variables['lat'][lats_idx]  # Range 42.0, 46.48
 times = [j for j in [i for i in dataset.variables['time'][:] if i >= startTime] if j <= endTime]
 simulationTimes = list(range(startTime, endTime, 24))

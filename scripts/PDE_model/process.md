@@ -74,7 +74,8 @@ I will start with the np.where thing, as I really appreaciate the way it solves 
 
 Hazel from the past future, now the now: The change has been successful. I was hanting a bug at some point which was just me not removing old code, so some simulation part was running twice. That is now fixed, and the changes have been implemented. I think it is possible to add the constant and nonconstant parts together, but I will wait with doing that until I have gotten the nonconstant VF into the simulation. For now, the resolutions seem to scale in a feasible manner: using grid sizes of 0.012 degrees (so 10x higher resolution than the flow data, coming in at 1.2km per stepsize) and dt of 0.01, a period of 14.4 minutes, simulating a full day takes 13 seconds. This means that at this scale, simulating the entire suite will take 3900 seconds or 1 hour and 15 minutes. Reducing the resolution can drastically increase this, but the download time for data is also a factor to consider. 
 
-
+# 14 May
+Today I _wanted_ to work on my overleaf, but the gods have willed an outage to strike, hence I must work on the code I was avoiding to work on. Therefor, I will implement the time-changing vector field today. First I will just get one vectorfield working, as I should be able to compare with another simulation I ran, and then I will get the time-changing in.
 
 
 

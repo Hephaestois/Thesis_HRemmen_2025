@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.special import kn #Modified bessel function of order n
+from scipy.interpolate import RegularGridInterpolator
 import netCDF4
 
 class Grid:
@@ -86,7 +87,7 @@ class Grid:
             self.diffusiveOperator_y = D
             
     def precalculateAdvectiveOperator(self):
-        N_y, N_x = self.x_num, self.y_num #These are intentionally swapped! Due to the side of u on which the operator needs to be applied. This is correct, don't worry about it Hazel
+        N_x, N_y = self.x_num, self.y_num #These are intentionally swapped! Due to the side of u on which the operator needs to be applied. This is correct, don't worry about it Hazel
 
         # 1D advection operator: backward- or forward difference depending on the sign.
         def advection_operator(N, advectionDirection):
@@ -105,35 +106,38 @@ class Grid:
         self.advectiveDownwindOperator_x = advection_operator(N_x, -1) / self.x_stepsize
         self.advectiveUpwindOperator_y = advection_operator(N_y, 1) / self.y_stepsize
         self.advectiveDownwindOperator_y = advection_operator(N_y, -1) / self.y_stepsize
-        
-    def precalculateAdvectiveOperatorVF(self):
-        #Similar to precalcAdvectiveOperator
-        N_y, N_x = self.x_num, self.y_num #Intentionally swapped!
-        
-        def advection_operator(N):
-            A = np.zeros((N,N))
-            
-            np.fill_diagonal(A[1:], 1)
-            np.fill_diagonal(A[:,1:], -1)
-            
-            return A
-        
-        self.advectiveOperatorVF_x = advection_operator(N_x) / (2*self.x_stepsize)
-        self.advectiveOperatorVF_y = advection_operator(N_y) / (2*self.y_stepsize)
-        pass
     
-    def getVectorField(self, source, simStep):
-        dataset = netCDF4.Dataset(source)
-        
-        # VF_x = np.abs(np.random.rand(50, 180))
-        # VF_y = np.abs(np.random.rand(50, 180))
-        
-        VF_x = np.random.rand(self.y_num, self.x_num)-0.5
-        VF_y = np.random.rand(self.y_num, self.x_num)-0.5
-        
+    def setLonLatVals(self, dataset, lons_idx, lats_idx):
+        self.lon_vals = dataset.variables['lon'][lons_idx]
+        self.lat_vals = dataset.variables['lat'][lats_idx]
+    
+    def getVectorField(self, dataset, lons_idx, lats_idx, timeIndex):
+        u_data = dataset.variables['water_u'][timeIndex, 0, lats_idx, lons_idx]
+        v_data = dataset.variables['water_v'][timeIndex, 0, lats_idx, lons_idx]
+
+        # Transpose the data to match the grid dimensions
+        u_data = u_data.T
+        v_data = v_data.T
+
+        u_interp = RegularGridInterpolator((self.lat_vals, self.lon_vals), u_data, bounds_error=False, fill_value=np.nan)
+        v_interp = RegularGridInterpolator((self.lat_vals, self.lon_vals), v_data, bounds_error=False, fill_value=np.nan)
+
+        # Create a grid of coordinates where you want to evaluate the interpolated values
+        lon_grid, lat_grid = np.meshgrid(np.linspace(self.lon_vals.min(), self.lon_vals.max(), self.x_num),
+                                        np.linspace(self.lat_vals.min(), self.lat_vals.max(), self.y_num))
+
+        # Flatten the grids for interpolation
+        points = np.column_stack((lat_grid.ravel(), lon_grid.ravel()))
+
+        # Interpolate the values
+        VF_x = u_interp(points).reshape(self.y_num, self.x_num) / 1000 * 86.4
+        VF_y = v_interp(points).reshape(self.y_num, self.x_num) / 1000 * 86.4
+
         self.vectorfield_x = VF_x
         self.vectorfield_y = VF_y
-                
+
+
+        
     def timeStep(self, diffusion=True, constantAdvection=True, VFAdvection=True):
         self.u_new = self.u_old
         
@@ -157,43 +161,30 @@ class Grid:
             au_x = self.advectionConstants[0]*self.u_old
             au_y = self.advectionConstants[1]*self.u_old
             
-            LHS_1_adv = np.matmul(A_x_up, np.where(au_x>=0, au_x, 0))
-            LHS_2_adv = np.matmul(A_x_down, np.where(au_x<0, au_x, 0))
-            RHS_1_adv = np.matmul(np.where(au_y>=0, au_y, 0), A_y_up)
-            RHS_2_adv = np.matmul(np.where(au_y<0, au_y, 0), A_y_down)
+            LHS_1_adv = np.matmul(np.where(au_x>=0, au_x, 0), A_x_up)
+            LHS_2_adv = np.matmul(np.where(au_x<0, au_x, 0), A_x_down)
+            RHS_1_adv = np.matmul(A_y_up, np.where(au_y>=0, au_y, 0))
+            RHS_2_adv = np.matmul(A_y_down, np.where(au_y<0, au_y, 0))
             
             self.u_new -= self.dt * (LHS_1_adv + LHS_2_adv + RHS_1_adv + RHS_2_adv)
         
         if VFAdvection:
-            # This should be very similar!
             A_x_up = self.advectiveUpwindOperator_x
             A_x_down = self.advectiveDownwindOperator_x
             A_y_up = self.advectiveUpwindOperator_y
             A_y_down = self.advectiveDownwindOperator_y
             
-            # The elementwise product of A*u, to use in np.where. 
-            # Here A is just the advection constants, in VF, it would be vectorfield_x with np.multiply
-            
-            # The order of the vectorfields here is weird to permit the function setVectorField to work intuitively.
+            # The order of the vectorfields here is INTENTIONALLY weird to permit the function setVectorField to work intuitively: numpy axis bs.
             au_x = np.multiply(self.vectorfield_y, self.u_old)
             au_y = np.multiply(-self.vectorfield_x, self.u_old)
             
-            LHS_1_adv = np.matmul(A_x_up, np.where(au_x>=0, au_x, 0))
-            LHS_2_adv = np.matmul(A_x_down, np.where(au_x<0, au_x, 0))
-            RHS_1_adv = np.matmul(np.where(au_y>=0, au_y, 0), A_y_up)
-            RHS_2_adv = np.matmul(np.where(au_y<0, au_y, 0), A_y_down)
+            LHS_1_adv = np.matmul(np.where(au_x>=0, au_x, 0), A_x_up)
+            LHS_2_adv = np.matmul(np.where(au_x<0, au_x, 0), A_x_down)
+            RHS_1_adv = np.matmul(A_y_up, np.where(au_y>=0, au_y, 0))
+            RHS_2_adv = np.matmul(A_y_down, np.where(au_y<0, au_y, 0))
             
             self.u_new -= self.dt * (LHS_1_adv + LHS_2_adv + RHS_1_adv + RHS_2_adv)
-
-        # if VFAdvection:
-        #     A_x = self.advectiveOperatorVF_x
-        #     A_y = self.advectiveOperatorVF_y
-                        
-        #     LHS_adv_VF = np.matmul(A_x, np.multiply(self.vectorfield_x, self.u_old))
-        #     RHS_adv_VF = np.matmul(np.multiply(self.vectorfield_y, self.u_old), A_y)
             
-        #     self.u_new -= self.dt * (LHS_adv_VF+RHS_adv_VF)
-        
         #Absorbing boundaries:
         self.overflow_top += np.sum(self.u_new[-1, :])
         self.overflow_bottom += np.sum(self.u_new[0, :])
