@@ -16,7 +16,7 @@ x_range = [-29, -11]
 y_range = [42, 47]
 dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
 dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
-dt = 0.001 # timestep between dataset swapping. scale: day.
+dt = 0.01 # timestep between dataset swapping. scale: day.
 
 
 ### Related to dataset time and VF
@@ -89,13 +89,17 @@ grid.setLonLatVals(dataset, lon_idx, lat_idx)
 N_steps_per_day = int(1/dt)
 start_time = time()
 
+
+vf_x, vf_y = grid.getVectorField(dataset, lon_idx, lat_idx, np.searchsorted(times, startTime) + startTimeIndex) #At the start of every 24 hours.
+
 for i in range(simLengthDays):
-    grid.addValue(grid.cti(-25, 44.5), 5)
+    grid.addValue(grid.cti(-25, 44.5), 1)
 
     simTime = startTime + i*timeResolution #Hours since 2000
     simTimeIndex = np.searchsorted(times, simTime) + startTimeIndex #To access dataset
     
-    grid.getVectorField(dataset, lon_idx, lat_idx, simTimeIndex) #At the start of every 24 hours.
+    #To plot a quiver later
+    # vf_x, vf_y = grid.getVectorField(dataset, lon_idx, lat_idx, simTimeIndex) #At the start of every 24 hours.
     
     for j in range(N_steps_per_day):
         grid.timeStep(diffusion=False, constantAdvection=True, VFAdvection=True)
@@ -113,6 +117,9 @@ matrix = grid.getMatrix()
 plt.figure(figsize=[8, 3], dpi=180)
 plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
 plt.imshow(matrix, origin='lower', extent=[-29, -11, 42, 47], aspect = 1, vmin=0, vmax=np.max(matrix))
+print(longitudes, latitudes, vf_x, vf_y)
+lon_grid, lat_grid = np.meshgrid(grid.x_s, grid.y_s)
+plt.quiver(lon_grid[::3, ::3], lat_grid[::3, ::3], vf_x[::3, ::3], vf_y[::3, ::3], scale=4, color='k')
 plt.colorbar()
 plt.xlabel('x')
 plt.ylabel('y')
@@ -120,12 +127,3 @@ plt.savefig('densityplot.png')
 plt.show()
 
 
-
-
-
-    
-
-
-
-
-    

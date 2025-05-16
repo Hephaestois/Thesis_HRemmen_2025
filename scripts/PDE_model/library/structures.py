@@ -115,12 +115,8 @@ class Grid:
         u_data = dataset.variables['water_u'][timeIndex, 0, lats_idx, lons_idx]
         v_data = dataset.variables['water_v'][timeIndex, 0, lats_idx, lons_idx]
         
-        print(np.shape(u_data))
         self.vectorfield_x = np.zeros((self.y_num, self.x_num))
         self.vectorfield_y = np.zeros((self.y_num, self.x_num))
-        
-        print("Carth length", len(self.lon_vals), len(self.lat_vals))
-        print("Idx length", len(lons_idx), len(lats_idx))
         
         for i in range(self.x_num):
             for j in range(self.y_num):
@@ -128,18 +124,15 @@ class Grid:
                 idx_data_lon = np.searchsorted(self.lon_vals, pos_x)
                 idx_data_lat = np.searchsorted(self.lat_vals, pos_y)
                 
-                print(pos_x, pos_y, self.cti(pos_x, pos_y), i,j, idx_data_lon, idx_data_lat)
-
                 x_val = u_data[idx_data_lat, idx_data_lon]
                 y_val = v_data[idx_data_lat, idx_data_lon]
                 
                 #Convert from mm/s to m/day
-                self.vectorfield_x[j, i] = x_val * 86.4 /1000
-                self.vectorfield_y[j, i] = y_val * 86.4 /1000
+                self.vectorfield_x[j, i] = x_val * 86.4 / 1000
+                self.vectorfield_y[j, i] = y_val * 86.4 / 1000
 
         
-        # self.vectorfield_x = 50*(np.random.rand(self.y_num,self.x_num)-0.5)
-        # self.vectorfield_y = 50*(np.random.rand(self.y_num,self.x_num)-0.5)
+        return self.vectorfield_x, self.vectorfield_y
 
 
         
@@ -180,8 +173,8 @@ class Grid:
             A_y_down = self.advectiveDownwindOperator_y
             
             # The order of the vectorfields here is INTENTIONALLY weird to permit the function setVectorField to work intuitively: numpy axis bs.
-            au_x = np.multiply(self.vectorfield_y, self.u_old)
-            au_y = np.multiply(-self.vectorfield_x, self.u_old)
+            au_x = np.multiply(self.vectorfield_x, self.u_old)
+            au_y = np.multiply(self.vectorfield_y, self.u_old)
             
             LHS_1_adv = np.matmul(np.where(au_x>=0, au_x, 0), A_x_up)
             LHS_2_adv = np.matmul(np.where(au_x<0, au_x, 0), A_x_down)
