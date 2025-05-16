@@ -2,6 +2,7 @@ import numpy as np
 from scipy.special import kn #Modified bessel function of order n
 from scipy.interpolate import RegularGridInterpolator
 import netCDF4
+import math
 
 class Grid:
     def __init__(self, x_carthesian_range, y_carthesian_range, x_stepsize, y_stepsize):
@@ -229,3 +230,21 @@ class Grid:
     def getOverflow(self):
         return self.overflow_bottom + self.overflow_top
         
+    def ic(self, type, v):
+        if type=='gauss':
+            A = v
+            x0 = (-25)
+            y0 = (44.5)
+            sigma_x = 1
+            sigma_y = 1
+
+            for i in self.x_idxs:
+                for j in self.y_idxs:
+                    x,y = self.itc(j, i)
+                    value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
+                    self.addValue(self.cti(*self.itc(j, i)), value)
+
+            
+        if type=='delta':
+            self.addValue(self.cti(-25, 44.5), v)
+            

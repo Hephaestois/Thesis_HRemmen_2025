@@ -5,13 +5,19 @@ import matplotlib.pyplot as plt
 import math
 from time import time
 import netCDF4
+import os
+import pickle
 from matplotlib import cm
 from matplotlib.colors import Normalize
+
+#
+### Start settings
+#
 
 ### Related to constants
 diffusionMatrix = [[0.00025, 0], [0, 0.00025]] #Is converted to NParray later.
 advectionVector = [0.1, 0] #Converted to NP later. Constant behaviour.
-
+initialCondition = 'gauss' #'delta' or 'gauss'. See grid.ic for details, or do it yourself using grid.addValue and grid.cti
 
 ### Related to integration domain
 x_range = [-29, -11]
@@ -20,15 +26,14 @@ dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. a
 dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
 dt = 0.01 # timestep between dataset swapping. scale: day.
 
-
 ### Related to dataset time and VF
 startTime = 131496      #Hours since 01-01-2000. This repr. 01-01-2015
 timeResolution = 24     #Hours between dataset snapshots. Intermediate timesteps use identical set.
-simLengthDays = 100
+simLengthDays = 10
 endTime = startTime + timeResolution * simLengthDays
 
-url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3'
-# No spatial resolution for the dataset is necessary; it is interpolated to fit to the grid size.
+### Dataset url
+url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
 
 ### Start simulation related stuff
 
@@ -40,36 +45,22 @@ grid.setTimestep(dt)
 grid.precalculateDiffusiveOperator(type="Neumann", direction="Horizontal")
 grid.precalculateDiffusiveOperator(type="Neumann", direction="Vertical")
 grid.precalculateAdvectiveOperator()
+grid.ic(initialCondition, 1)
 
-# ## IC: Gaussian
-# A = 1
-# x0 = (-25)
-# y0 = (44.5)
-# sigma_x = 1
-# sigma_y = 1
+#
+### End simulation related stuff
+#
 
-# for i in grid.x_idxs:
-#     for j in grid.y_idxs:
-#         x,y = grid.itc(j, i)
-#         value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
-#         grid.addValue(grid.cti(*grid.itc(j, i)), value)
-# ## End IC
-
-# ## IC: point mass
-
-
-# ## End IC
+#
+### Start vectorfield data
+#
 
 dataset = netCDF4.Dataset(url)
-# times = [j for j in [i for i in dataset.variables['time'][:] if i >= startTime] if j <= endTime]
-# longitudes = [j for j in [i for i in dataset.variables['lon'][:] if i >= min(x_range)] if j <= max(x_range)]
-# latitudes = [j for j in [i for i in dataset.variables['lat'][:] if i >= min(y_range)] if j <= max(y_range)]
 
 # Original arrays
 time_array = dataset.variables['time'][:]
 lon_array = dataset.variables['lon'][:]
 lat_array = dataset.variables['lat'][:]
-
 
 # Time indices and values
 time_mask = (time_array >= startTime) & (time_array <= endTime)
@@ -91,11 +82,16 @@ grid.setLonLatVals(dataset, lon_idx, lat_idx)
 N_steps_per_day = int(1/dt)
 start_time = time()
 
+#
+### End vectorfield data
+#
 
-
+#
+### Start main loop
+#
 
 for i in range(simLengthDays):
-    grid.addValue(grid.cti(-25, 44.5), 5)
+    #grid.addValue(grid.cti(-25, 44.5), 5)
     
     simTime = startTime + i*timeResolution #Hours since 2000
     simTimeIndex = np.searchsorted(times, simTime) + startTimeIndex #To access dataset
