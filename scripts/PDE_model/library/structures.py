@@ -173,7 +173,7 @@ class Grid:
             A_y_down = self.advectiveDownwindOperator_y
             
             # The order of the vectorfields here is INTENTIONALLY weird to permit the function setVectorField to work intuitively: numpy axis bs.
-            au_x = np.multiply(self.vectorfield_x, self.u_old)
+            au_x = np.multiply(-self.vectorfield_x, self.u_old)
             au_y = np.multiply(self.vectorfield_y, self.u_old)
             
             LHS_1_adv = np.matmul(np.where(au_x>=0, au_x, 0), A_x_up)

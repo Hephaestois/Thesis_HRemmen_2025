@@ -90,6 +90,7 @@ Doing this, I am 'skipping' issues with dimensionality and such: all my values a
 I am not anymore interpolating with this, but because my integrating a random VF has shown the method to be quite robust, I am not affraid of instability. I have increased the random field strength to [-25, 25]. This did not cause issues with stability if dt was changed appropriately. Considering the values in the dataset fall roughly within this range, I am satisfied to just go with no interpolation.
 
 I think the vectorfield is working correctly. I want to verify by plotting the VF using plt.quiver. So I am going to do that.
+Judging by the PLT quiver, I can now surely say that the VF is working correctly. The changing vectorfield is of course harder to plot, so for that I just use the most recent vector field we encountered.
 
 
 

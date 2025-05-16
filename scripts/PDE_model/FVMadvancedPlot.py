@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import math
 from time import time
 import netCDF4
+from matplotlib import cm
+from matplotlib.colors import Normalize
 
 ### Related to constants
 diffusionMatrix = [[0.00025, 0], [0, 0.00025]] #Is converted to NParray later.
@@ -22,7 +24,7 @@ dt = 0.01 # timestep between dataset swapping. scale: day.
 ### Related to dataset time and VF
 startTime = 131496      #Hours since 01-01-2000. This repr. 01-01-2015
 timeResolution = 24     #Hours between dataset snapshots. Intermediate timesteps use identical set.
-simLengthDays = 50
+simLengthDays = 100
 endTime = startTime + timeResolution * simLengthDays
 
 url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3'
@@ -110,11 +112,18 @@ print('Overflow Ratio:', grid.getOverflowRatio())
 print('Overflow through bottom:', grid.getOverflowBottom())
 
 matrix = grid.getMatrix()
+masked_matrix = np.ma.masked_less(matrix, 0.01)
+
+# Create a colormap and set the "bad" (masked) color to white or gray
+cmap = cm.viridis.copy()
+cmap.set_bad(color='white')  # Or 'white'
 
 plt.figure(figsize=[8, 3], dpi=180)
 plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
-plt.imshow(matrix, origin='lower', extent=[-29, -11, 42, 47], aspect = 1, vmin=0.01, vmax=np.max(matrix))
-print(longitudes, latitudes, vf_x, vf_y)
+# Use masked matrix and custom colormap
+plt.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
+           aspect=1, vmin=0.01, vmax=np.max(matrix), cmap=cmap)
+
 lon_grid, lat_grid = np.meshgrid(grid.x_s, grid.y_s)
 plt.quiver(lon_grid[::3, ::3], lat_grid[::3, ::3], vf_x[::3, ::3], vf_y[::3, ::3], scale=4, color='k')
 plt.plot((-25), (44.5), 'r.')
