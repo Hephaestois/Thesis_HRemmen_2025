@@ -7,22 +7,22 @@ from time import time
 import netCDF4
 
 ### Related to constants
-diffusionMatrix = [[1, 0], [0, 1]] #Is converted to NParray later.
+diffusionMatrix = [[0.00025, 0], [0, 0.00025]] #Is converted to NParray later.
 advectionVector = [0.1, 0] #Converted to NP later. Constant behaviour.
 
 
 ### Related to integration domain
 x_range = [-29, -11]
 y_range = [42, 47]
-dx = 0.03 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
-dy = 0.03 # Ex: 0.01 breaks, 0.012 doesn't.
+dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
+dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
 dt = 0.001 # timestep between dataset swapping. scale: day.
 
 
 ### Related to dataset time and VF
 startTime = 131496      #Hours since 01-01-2000. This repr. 01-01-2015
 timeResolution = 24     #Hours between dataset snapshots. Intermediate timesteps use identical set.
-simLengthDays = 1
+simLengthDays = 50
 endTime = startTime + timeResolution * simLengthDays
 
 url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3'
@@ -40,22 +40,21 @@ grid.precalculateDiffusiveOperator(type="Neumann", direction="Vertical")
 grid.precalculateAdvectiveOperator()
 
 # ## IC: Gaussian
-A = 1
-x0 = (-25)
-y0 = (44.5)
-sigma_x = 1
-sigma_y = 1
+# A = 1
+# x0 = (-25)
+# y0 = (44.5)
+# sigma_x = 1
+# sigma_y = 1
 
-for i in grid.x_idxs:
-    for j in grid.y_idxs:
-        x,y = grid.itc(j, i)
-        value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
-        grid.addValue(grid.cti(*grid.itc(j, i)), value)
+# for i in grid.x_idxs:
+#     for j in grid.y_idxs:
+#         x,y = grid.itc(j, i)
+#         value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
+#         grid.addValue(grid.cti(*grid.itc(j, i)), value)
 # ## End IC
 
 # ## IC: point mass
 
-#grid.addValue(grid.cti(-25, 44.5), 10)
 
 # ## End IC
 
@@ -91,13 +90,15 @@ N_steps_per_day = int(1/dt)
 start_time = time()
 
 for i in range(simLengthDays):
+    grid.addValue(grid.cti(-25, 44.5), 5)
+
     simTime = startTime + i*timeResolution #Hours since 2000
     simTimeIndex = np.searchsorted(times, simTime) + startTimeIndex #To access dataset
     
-    grid.getVectorField(dataset, lat_idx, lon_idx, simTimeIndex) #At the start of every 24 hours.
+    grid.getVectorField(dataset, lon_idx, lat_idx, simTimeIndex) #At the start of every 24 hours.
     
     for j in range(N_steps_per_day):
-        grid.timeStep(diffusion=False, constantAdvection=False, VFAdvection=True)
+        grid.timeStep(diffusion=False, constantAdvection=True, VFAdvection=True)
         progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
 
     
@@ -110,14 +111,13 @@ print('Overflow through bottom:', grid.getOverflowBottom())
 matrix = grid.getMatrix()
 
 plt.figure(figsize=[8, 3], dpi=180)
-plt.imshow(matrix, origin='lower', extent=[-29, -11, 42, 47], aspect = 1, vmin=0, vmax=1)
-
+plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
+plt.imshow(matrix, origin='lower', extent=[-29, -11, 42, 47], aspect = 1, vmin=0, vmax=np.max(matrix))
 plt.colorbar()
 plt.xlabel('x')
 plt.ylabel('y')
-plt.title('Density Field')
+plt.savefig('densityplot.png')
 plt.show()
-
 
 
 

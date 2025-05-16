@@ -77,7 +77,19 @@ Hazel from the past future, now the now: The change has been successful. I was h
 # 14 May
 Today I _wanted_ to work on my overleaf, but the gods have willed an outage to strike, hence I must work on the code I was avoiding to work on. Therefor, I will implement the time-changing vector field today. First I will just get one vectorfield working, as I should be able to compare with another simulation I ran, and then I will get the time-changing in.
 
+# 16 May
+Yesterday was a very slow day for myself. I have done some work then, but haven't written it down. It was mostly in the overleaf, but doesn't deserve mention.
 
+Today I have had a realization: Instead of calclulating a function that interpolates a on a grid, and to then sample that on my function u, I can also approach this the other way around. I am okay with a less efficient function here, so I am going to do the following steps:
+ - Extract the coordinate of a gridpoint in u
+ - Find the index of this coordinate in the dataset
+ - Find the value at this index in the dataset
+ - Assign it to the coordinate of the gridpoint
+ - Rinse and repeat in for loops.
+Doing this, I am 'skipping' issues with dimensionality and such: all my values are fetched at once.
+I am not anymore interpolating with this, but because my integrating a random VF has shown the method to be quite robust, I am not affraid of instability. I have increased the random field strength to [-25, 25]. This did not cause issues with stability if dt was changed appropriately. Considering the values in the dataset fall roughly within this range, I am satisfied to just go with no interpolation.
+
+I think the vectorfield is working correctly. I want to verify by plotting the VF using plt.quiver. So I am going to do that.
 
 
 

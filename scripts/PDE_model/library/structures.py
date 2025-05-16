@@ -114,32 +114,32 @@ class Grid:
     def getVectorField(self, dataset, lons_idx, lats_idx, timeIndex):
         u_data = dataset.variables['water_u'][timeIndex, 0, lats_idx, lons_idx]
         v_data = dataset.variables['water_v'][timeIndex, 0, lats_idx, lons_idx]
-
-        # Transpose the data to match the grid dimensions
-        u_data = u_data
-        v_data = v_data
-
-        u_interp = RegularGridInterpolator((self.lon_vals, self.lat_vals), u_data)
-        v_interp = RegularGridInterpolator((self.lon_vals, self.lat_vals), v_data)
-
-        # Create a grid of coordinates where you want to evaluate the interpolated values
-        lon_grid, lat_grid = np.meshgrid(np.linspace(self.lat_vals.min(), self.lat_vals.max(), self.y_num),
-                                         np.linspace(self.lon_vals.min(), self.lon_vals.max(), self.x_num))
-
-        # Flatten the grids for interpolation
-        points = np.column_stack((lat_grid.ravel(), lon_grid.ravel()))
-
-        # Interpolate the values
-        VF_x = u_interp(points).reshape(self.y_num, self.x_num) / 1000 * 86.4
-        VF_y = v_interp(points).reshape(self.y_num, self.x_num) / 1000 * 86.4
         
-        print(VF_x, VF_y)
-
-        self.vectorfield_x = VF_x
-        self.vectorfield_y = VF_y
+        print(np.shape(u_data))
+        self.vectorfield_x = np.zeros((self.y_num, self.x_num))
+        self.vectorfield_y = np.zeros((self.y_num, self.x_num))
         
-        # self.vectorfield_x = np.random.rand(self.y_num,self.x_num)-0.5
-        # self.vectorfield_y = np.random.rand(self.y_num,self.x_num)-0.5
+        print("Carth length", len(self.lon_vals), len(self.lat_vals))
+        print("Idx length", len(lons_idx), len(lats_idx))
+        
+        for i in range(self.x_num):
+            for j in range(self.y_num):
+                pos_x, pos_y = self.itc(j, i)
+                idx_data_lon = np.searchsorted(self.lon_vals, pos_x)
+                idx_data_lat = np.searchsorted(self.lat_vals, pos_y)
+                
+                print(pos_x, pos_y, self.cti(pos_x, pos_y), i,j, idx_data_lon, idx_data_lat)
+
+                x_val = u_data[idx_data_lat, idx_data_lon]
+                y_val = v_data[idx_data_lat, idx_data_lon]
+                
+                #Convert from mm/s to m/day
+                self.vectorfield_x[j, i] = x_val * 86.4 /1000
+                self.vectorfield_y[j, i] = y_val * 86.4 /1000
+
+        
+        # self.vectorfield_x = 50*(np.random.rand(self.y_num,self.x_num)-0.5)
+        # self.vectorfield_y = 50*(np.random.rand(self.y_num,self.x_num)-0.5)
 
 
         
