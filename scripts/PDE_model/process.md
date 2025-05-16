@@ -81,8 +81,15 @@ Today I _wanted_ to work on my overleaf, but the gods have willed an outage to s
 
 
 
+# List of attendees/invites for the final presentation: (who still need to know a location)
 
+Sam Mooney & Anne Mooney
+Vader & Moeder
+Sol van der Eng
+Uni vrienden & Middelbare school vrienden
+Martin & Kim Wlazlo
+Familie & familie van Frey
+Frey
 
-
-
+Supervisors: Havva & Jeroen
 

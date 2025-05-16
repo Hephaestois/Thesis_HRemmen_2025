@@ -14,9 +14,9 @@ advectionVector = [0.1, 0] #Converted to NP later. Constant behaviour.
 ### Related to integration domain
 x_range = [-29, -11]
 y_range = [42, 47]
-dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
-dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
-dt = 0.0005 # timestep between dataset swapping. scale: day.
+dx = 0.03 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
+dy = 0.03 # Ex: 0.01 breaks, 0.012 doesn't.
+dt = 0.001 # timestep between dataset swapping. scale: day.
 
 
 ### Related to dataset time and VF
@@ -40,22 +40,22 @@ grid.precalculateDiffusiveOperator(type="Neumann", direction="Vertical")
 grid.precalculateAdvectiveOperator()
 
 # ## IC: Gaussian
-# A = 1
-# x0 = (-25)
-# y0 = (44.5)
-# sigma_x = 1
-# sigma_y = 1
+A = 1
+x0 = (-25)
+y0 = (44.5)
+sigma_x = 1
+sigma_y = 1
 
-# for i in grid.x_idxs:
-#     for j in grid.y_idxs:
-#         x,y = grid.itc(j, i)
-#         value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
-#         grid.addValue(grid.cti(*grid.itc(j, i)), value)
+for i in grid.x_idxs:
+    for j in grid.y_idxs:
+        x,y = grid.itc(j, i)
+        value = A * math.exp(-((x - x0)**2) / (2 * sigma_x**2) - ((y - y0)**2) / (2 * sigma_y**2))
+        grid.addValue(grid.cti(*grid.itc(j, i)), value)
 # ## End IC
 
 # ## IC: point mass
 
-grid.addValue(grid.cti(-25, 44.5), 10)
+#grid.addValue(grid.cti(-25, 44.5), 10)
 
 # ## End IC
 
@@ -97,7 +97,7 @@ for i in range(simLengthDays):
     grid.getVectorField(dataset, lat_idx, lon_idx, simTimeIndex) #At the start of every 24 hours.
     
     for j in range(N_steps_per_day):
-        grid.timeStep(diffusion=True, constantAdvection=True, VFAdvection=True)
+        grid.timeStep(diffusion=False, constantAdvection=False, VFAdvection=True)
         progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
 
     

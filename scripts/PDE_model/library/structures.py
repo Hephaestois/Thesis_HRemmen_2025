@@ -116,15 +116,15 @@ class Grid:
         v_data = dataset.variables['water_v'][timeIndex, 0, lats_idx, lons_idx]
 
         # Transpose the data to match the grid dimensions
-        u_data = u_data.T
-        v_data = v_data.T
+        u_data = u_data
+        v_data = v_data
 
-        u_interp = RegularGridInterpolator((self.lat_vals, self.lon_vals), u_data, bounds_error=False, fill_value=np.nan)
-        v_interp = RegularGridInterpolator((self.lat_vals, self.lon_vals), v_data, bounds_error=False, fill_value=np.nan)
+        u_interp = RegularGridInterpolator((self.lon_vals, self.lat_vals), u_data)
+        v_interp = RegularGridInterpolator((self.lon_vals, self.lat_vals), v_data)
 
         # Create a grid of coordinates where you want to evaluate the interpolated values
-        lon_grid, lat_grid = np.meshgrid(np.linspace(self.lon_vals.min(), self.lon_vals.max(), self.x_num),
-                                        np.linspace(self.lat_vals.min(), self.lat_vals.max(), self.y_num))
+        lon_grid, lat_grid = np.meshgrid(np.linspace(self.lat_vals.min(), self.lat_vals.max(), self.y_num),
+                                         np.linspace(self.lon_vals.min(), self.lon_vals.max(), self.x_num))
 
         # Flatten the grids for interpolation
         points = np.column_stack((lat_grid.ravel(), lon_grid.ravel()))
@@ -132,9 +132,14 @@ class Grid:
         # Interpolate the values
         VF_x = u_interp(points).reshape(self.y_num, self.x_num) / 1000 * 86.4
         VF_y = v_interp(points).reshape(self.y_num, self.x_num) / 1000 * 86.4
+        
+        print(VF_x, VF_y)
 
         self.vectorfield_x = VF_x
         self.vectorfield_y = VF_y
+        
+        # self.vectorfield_x = np.random.rand(self.y_num,self.x_num)-0.5
+        # self.vectorfield_y = np.random.rand(self.y_num,self.x_num)-0.5
 
 
         
