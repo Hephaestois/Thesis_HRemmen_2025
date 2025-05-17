@@ -173,7 +173,8 @@ class Grid:
             A_y_up = self.advectiveUpwindOperator_y
             A_y_down = self.advectiveDownwindOperator_y
             
-            # The order of the vectorfields here is INTENTIONALLY weird to permit the function setVectorField to work intuitively: numpy axis bs.
+            # The order of the vectorfields here is INTENTIONALLY weird to permit the function setVectorField to work intuitively along correct axes: numpy axis bs. 
+            # Direction should be verified, but the plt.quiver (VF plot) looks fine.
             au_x = np.multiply(-self.vectorfield_x, self.u_old)
             au_y = np.multiply(self.vectorfield_y, self.u_old)
             

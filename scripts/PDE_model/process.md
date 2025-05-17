@@ -96,13 +96,13 @@ Judging by the PLT quiver, I can now surely say that the VF is working correctly
 
 # List of attendees/invites for the final presentation: (who still need to know a location)
 
-Sam Mooney & Anne Mooney
 Vader & Moeder
-Sol van der Eng
-Uni vrienden & Middelbare school vrienden
-Martin & Kim Wlazlo
-Familie & familie van Frey
 Frey
+Sol & Yoshi van der Eng (TBD)
+Familie & familie van Frey (TBD who exactly)
+Sam Mooney & Anne Mooney (TBD)
+Martin & Kim Wlazlo (TBD)
+Uni vrienden & Middelbare school vrienden (TBD who exactly)
 
 Supervisors: Havva & Jeroen
 
