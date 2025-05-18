@@ -15,21 +15,21 @@ from matplotlib.colors import Normalize
 #
 
 ### Related to constants
-diffusionMatrix = [[0.00025, 0], [0, 0.00025]] #Is converted to NParray later.
+diffusionMatrix = [[0.00025, 0], [0, 0.00025]] #Converted to NParray later. Diffusion behaviour
 advectionVector = [0.1, 0] #Converted to NP later. Constant behaviour.
-initialCondition = 'gauss' #'delta' or 'gauss'. See grid.ic for details, or do it yourself using grid.addValue and grid.cti
+initialCondition = 'inflow' #'delta' or 'gauss'. See grid.ic for details, or manage manually using grid.addValue and grid.cti (coord. to index)
 
 ### Related to integration domain
 x_range = [-29, -11]
 y_range = [42, 47]
-dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
-dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
-dt = 0.01 # timestep between dataset swapping. scale: day.
+dx = 0.04 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
+dy = 0.04 # Ex: 0.01 breaks, 0.012 doesn't.
+dt = 0.001 # timestep between dataset swapping. scale: day.
 
 ### Related to dataset time and VF
 startTime = 131496      #Hours since 01-01-2000. This repr. 01-01-2015
 timeResolution = 24     #Hours between dataset snapshots. Intermediate timesteps use identical set.
-simLengthDays = 10
+simLengthDays = 50
 endTime = startTime + timeResolution * simLengthDays
 
 ### Dataset url
@@ -45,7 +45,7 @@ grid.setTimestep(dt)
 grid.precalculateDiffusiveOperator(type="Neumann", direction="Horizontal")
 grid.precalculateDiffusiveOperator(type="Neumann", direction="Vertical")
 grid.precalculateAdvectiveOperator()
-grid.ic(initialCondition, 1)
+grid.ic(initialCondition, 400)
 
 #
 ### End simulation related stuff
@@ -56,6 +56,7 @@ grid.ic(initialCondition, 1)
 #
 
 dataset = netCDF4.Dataset(url)
+e = 1e-3 #Small offset for mask boundaries
 
 # Original arrays
 time_array = dataset.variables['time'][:]
@@ -69,18 +70,17 @@ times = time_array[time_idx]
 startTimeIndex = list(time_array).index(startTime)
 
 # Longitude indices and values
-lon_mask = (lon_array >= min(x_range)) & (lon_array <= max(x_range))
+lon_mask = (lon_array >= min(x_range)-e) & (lon_array <= max(x_range)+e)
 lon_idx = np.where(lon_mask)[0]
 longitudes = lon_array[lon_idx]
 
 # Latitude indices and values
-lat_mask = (lat_array >= min(y_range)) & (lat_array <= max(y_range))
+lat_mask = (lat_array >= min(y_range)-e) & (lat_array <= max(y_range)+e)
 lat_idx = np.where(lat_mask)[0]
 latitudes = lat_array[lat_idx]
 grid.setLonLatVals(dataset, lon_idx, lat_idx)
 
 N_steps_per_day = int(1/dt)
-start_time = time()
 
 #
 ### End vectorfield data
@@ -90,8 +90,10 @@ start_time = time()
 ### Start main loop
 #
 
+start_time = time()
 for i in range(simLengthDays):
-    #grid.addValue(grid.cti(-25, 44.5), 5)
+    if initialCondition == 'inflow':
+        grid.addValue(grid.cti(-25, 44.5), 5)
     
     simTime = startTime + i*timeResolution #Hours since 2000
     simTimeIndex = np.searchsorted(times, simTime) + startTimeIndex #To access dataset
@@ -121,7 +123,7 @@ plt.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
            aspect=1, vmin=0.01, vmax=np.max(matrix), cmap=cmap)
 
 lon_grid, lat_grid = np.meshgrid(grid.x_s, grid.y_s)
-plt.quiver(lon_grid[::3, ::3], lat_grid[::3, ::3], vf_x[::3, ::3], vf_y[::3, ::3], scale=4, color='k')
+plt.quiver(lon_grid[::6, ::6], lat_grid[::6, ::6], vf_x[::6, ::6], vf_y[::6, ::6], scale=4, color='k')
 plt.plot((-25), (44.5), 'r.')
 plt.colorbar()
 plt.xlabel('x')

@@ -92,6 +92,11 @@ I am not anymore interpolating with this, but because my integrating a random VF
 I think the vectorfield is working correctly. I want to verify by plotting the VF using plt.quiver. So I am going to do that.
 Judging by the PLT quiver, I can now surely say that the VF is working correctly. The changing vectorfield is of course harder to plot, so for that I just use the most recent vector field we encountered.
 
+# 17 may
+Did some writing work in Overleaf, code was mostly idle today.
+
+# 18 May
+Today I want to fix two issues I know exist. One is the scale-relevance on the density. Changing the space-step (also a problem which I have now fixed) to a larger or smaller step changed the solution more than is justifyable with resolution arguments. Therefor, there must be an influence of space-step on solution which is obviously wrong. I think this happens because I have rescaled the flow field units to meter per day, but I want to try to set this to be x_stepsize degrees / t_stepsize days 
 
 
 # List of attendees/invites for the final presentation: (who still need to know a location)

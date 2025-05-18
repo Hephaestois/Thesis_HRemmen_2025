@@ -10,8 +10,8 @@ class Grid:
         self.y_carthesian_range = y_carthesian_range
         self.x_stepsize = x_stepsize
         self.y_stepsize = y_stepsize
-        self.x_s = np.arange(min(x_carthesian_range), max(x_carthesian_range), self.x_stepsize) # ? 
-        self.y_s = np.arange(min(y_carthesian_range), max(y_carthesian_range), self.y_stepsize) #
+        self.x_s = np.arange(min(x_carthesian_range), max(x_carthesian_range), self.x_stepsize) # ? max(x_carthesian_range), int(round((max(x_carthesian_range) - min(x_carthesian_range)) / self.x_stepsize)) + 1
+        self.y_s = np.arange(min(y_carthesian_range), max(y_carthesian_range), self.y_stepsize) #   max(y_carthesian_range), int(round((max(y_carthesian_range) - min(y_carthesian_range)) / self.y_stepsize)) + 1
         self.x_num = len(self.x_s)
         self.y_num = len(self.y_s)
         
@@ -49,10 +49,10 @@ class Grid:
         self.advectionConstants = np.array([A[1],-A[0]])
     
     def setValue(self, pos, value):
-        self.u_old[pos] = value
+        self.u_old[pos] = value/(self.x_stepsize*self.y_stepsize)
     
     def addValue(self, pos, value):
-        self.u_old[pos] += value
+        self.u_old[pos] += value/(self.x_stepsize*self.y_stepsize)
     
     def setTimestep(self, timestep):
         self.dt = timestep
@@ -122,15 +122,16 @@ class Grid:
         for i in range(self.x_num):
             for j in range(self.y_num):
                 pos_x, pos_y = self.itc(j, i)
-                idx_data_lon = np.searchsorted(self.lon_vals, pos_x)
-                idx_data_lat = np.searchsorted(self.lat_vals, pos_y)
+                idx_data_lon = np.clip(np.searchsorted(self.lon_vals, pos_x), 0, len(self.lon_vals)-1)
+                idx_data_lat = np.clip(np.searchsorted(self.lat_vals, pos_y), 0, len(self.lat_vals)-1)
                 
                 x_val = u_data[idx_data_lat, idx_data_lon]
                 y_val = v_data[idx_data_lat, idx_data_lon]
                 
-                #Convert from mm/s to m/day
-                self.vectorfield_x[j, i] = x_val * 86.4 / 1000
-                self.vectorfield_y[j, i] = y_val * 86.4 / 1000
+                # Convert from mm/s to m/day
+                # These constants are debatable, and so they will be!
+                self.vectorfield_x[j, i] = x_val * (86.4) / (100_000*self.x_stepsize)
+                self.vectorfield_y[j, i] = y_val * (86.4) / (100_000*self.y_stepsize)
 
         
         return self.vectorfield_x, self.vectorfield_y
@@ -196,7 +197,7 @@ class Grid:
         self.u_old = self.u_new
         
     def getMatrix(self):
-        return self.u_old
+        return self.u_old * self.x_stepsize * self.y_stepsize
     
     def itc(self, j, i):
         '''Index (j,i) to coordinate (x,y)'''
@@ -213,23 +214,23 @@ class Grid:
         return (j, i)
         
     def getTotalValue(self):
-        return np.sum(self.u_old)
+        return np.sum(self.u_old) * self.x_stepsize * self.y_stepsize
     
     def getOverflowBottom(self):
-        return self.overflow_bottom
+        return self.overflow_bottom * self.x_stepsize * self.y_stepsize
     
     def getOverflowRatio(self):
         '''Ratio between bottom overflow and total overflow'''
         try:
-            return self.overflow_bottom / (self.overflow_bottom+self.overflow_top)
+            return self.overflow_bottom / (self.overflow_bottom+self.overflow_top) * self.x_stepsize * self.y_stepsize
         except:
             return None
         
     def getOverflowTop(self):
-        return self.overflow_top
+        return self.overflow_top * self.x_stepsize * self.y_stepsize
     
     def getOverflow(self):
-        return self.overflow_bottom + self.overflow_top
+        return (self.overflow_bottom + self.overflow_top) * self.x_stepsize * self.y_stepsize
         
     def ic(self, type, v):
         if type=='gauss':
