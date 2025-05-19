@@ -36,8 +36,9 @@ timeResolution = 24     #Hours between dataset snapshots. Intermediate timesteps
 endTime = startTime + timeResolution * simLengthDays
 quiver_step = int(np.floor(0.4/dx))
 
-### Dataset url. 2 are needed as the simulation range crosses a time bound
-url1 = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+### Dataset url
+url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+
 ### Start simulation related stuff
 
 grid = Grid(x_range, y_range, dx ,dy)

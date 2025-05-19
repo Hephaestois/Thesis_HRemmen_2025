@@ -46,7 +46,7 @@ class Grid:
         
     def setAdvectionConstant(self, A):
         # Change is necessary to make format readable for humans: necessity comes from difference between (x,y) and  (i,j) in matrix form!
-        self.advectionConstants = np.array([A[1],-A[0]])
+        self.advectionConstants = np.array([-A[0],A[1]])
     
     def setValue(self, pos, value):
         self.u_old[pos] = value/(self.x_stepsize*self.y_stepsize)
@@ -128,15 +128,14 @@ class Grid:
                 x_val = u_data[idx_data_lat, idx_data_lon]
                 y_val = v_data[idx_data_lat, idx_data_lon]
                 
+                if x_val==-30000 or y_val==-30000:
+                    print('misread')
                 # Convert from mm/s to m/day
                 # These constants are debatable, and so they will be!
-                self.vectorfield_x[j, i] = x_val * (86.4) / (100_000*self.x_stepsize)
-                self.vectorfield_y[j, i] = y_val * (86.4) / (100_000*self.y_stepsize)
+                self.vectorfield_x[j, i] = 0.864*x_val
+                self.vectorfield_y[j, i] = 0.864*y_val
 
-        
         return self.vectorfield_x, self.vectorfield_y
-
-
         
     def timeStep(self, diffusion=True, constantAdvection=True, VFAdvection=True):
         self.u_new = self.u_old

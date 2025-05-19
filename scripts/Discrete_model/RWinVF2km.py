@@ -10,15 +10,15 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_steps = 300 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
-N_steps_per_timestep = 5 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
+N_simulation_steps = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
+N_steps_per_timestep = 100 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
 N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4]) #lon(x), lat(y)
 initial_probability = (0.174468, 0.28168, 0.09942134, 0.4444274) #lrud
-horizontalStepSize = 0.05 # Turtle step size, in degrees lat/long
-verticalStepSize = 0.05   # Turtle step size, in degrees lat/long
+horizontalStepSize = 0.002 # Turtle step size, in degrees lat/long
+verticalStepSize = 0.002   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
 startTime = 131496 #01-01-2015
