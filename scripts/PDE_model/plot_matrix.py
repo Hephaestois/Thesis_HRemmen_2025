@@ -12,7 +12,7 @@ dt = 0.01
 simLengthDays = 100
 
 
-masked_matrix = np.ma.masked_less(matrix, 0.03) #5 times as much
+masked_matrix = np.ma.masked_less(matrix, 0.004) #5 times as much
 
 # Create a colormap and set the "bad" (masked) color to white or gray
 cmap = cm.viridis.copy()
@@ -22,7 +22,7 @@ plt.figure(figsize=[8, 3], dpi=180)
 plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
 # Use masked matrix and custom colormap
 plt.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
-           aspect=1, vmin=0, vmax=0.45, cmap=cmap) #5 times as high
+           aspect=1, vmin=0, vmax=0.1, cmap=cmap) #5 times as high
 
 # lon_grid, lat_grid = np.meshgrid(grid.x_s, grid.y_s)
 # plt.quiver(lon_grid[::3, ::3], lat_grid[::3, ::3], vf_x[::3, ::3], vf_y[::3, ::3], scale=40, color='k')
