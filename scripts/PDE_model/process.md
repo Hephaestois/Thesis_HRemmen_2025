@@ -98,6 +98,25 @@ Did some writing work in Overleaf, code was mostly idle today.
 # 18 May
 Today I want to fix two issues I know exist. One is the scale-relevance on the density. Changing the space-step (also a problem which I have now fixed) to a larger or smaller step changed the solution more than is justifyable with resolution arguments. Therefor, there must be an influence of space-step on solution which is obviously wrong. I think this happens because I have rescaled the flow field units to meter per day, but I want to try to set this to be x_stepsize degrees / t_stepsize days 
 
+# 19 May
+
+HUGE RESULTS
+I have calibrated A, figured out its units are degrees per day, and thus made the daily swim distance to be equal to 2km/day as in Painter and Hillen. Using this I have calibrated the strength of the flow field by converting m/s to degrees per day. I changed my simulation to run on the data from 2016. Now I have gotten very convincing results extremely similar to Painter and Hillen. GREAT SUCCESS!!!
+
+To accomodate for simulating more recent years, I have created 'FVM2016.py' in the directory 'years'. This is because the datasets have different lengths, and the logic of switching between them would be too spaghetti to do in general, so I will do it specifically for each dataset. 
+
+This means that either the plots don't get a vector field overlaid, or plotting is separated but is dependent on the vector fields which would be a lot of work. In any case I will save the datasets, so that plots without a vecctorfield can always be reproduced.
+
+I am currently running a simulation at the 0.04x0.04x0.001 scale. This is quite slow, but most of that time is taken up by datasets being sent around. I should _probably_ look into faster dataset acquisition. Downloading them locally might be the solution after all?
+
+# 20 may
+
+(written on 19 may, for future hazel)
+To make the vectorfield-swapping functional, I need to provide the program with the multiple URLs the data is being acquired from, and switch them when 'time runs out'. The time variable still needs to remain within the permissible steps on which the data is defined. This means that I will need a pretty bulky amount of logic, which I mmight wrap in a separate function if it is not too outlandishly complicated.
+
+
+
+
 
 # List of attendees/invites for the final presentation: (who still need to know a location)
 
