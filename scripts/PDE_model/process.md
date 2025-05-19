@@ -106,7 +106,7 @@ Frey
 Sol & Yoshi van der Eng (TBD)
 Familie & familie van Frey (TBD who exactly)
 Sam Mooney & Anne Mooney (TBD)
-Martin & Kim Wlazlo (TBD)
+Taico Aerts
 Uni vrienden & Middelbare school vrienden (TBD who exactly)
 
 Supervisors: Havva & Jeroen
