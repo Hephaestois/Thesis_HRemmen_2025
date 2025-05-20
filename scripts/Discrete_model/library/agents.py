@@ -90,19 +90,28 @@ class Walker:
         lon = self.position[0]
         lat = self.position[1]
         
+        ### LINterp
         # Get decimal (lat_idx, lon_idx) position
-        lon_idx, lat_idx = positionToIndex(vectorfield, lon, lat)
+        # lon_idx, lat_idx = positionToIndex(vectorfield, lon, lat)
 
-        # Interpolate u, v using RegularGridInterpolator
-        u_interp = vectorfield['water_u']  # Interpolator expects (lat_idx, lon_idx)
-        v_interp = vectorfield['water_v']
+        # # Interpolate u, v using RegularGridInterpolator
+        # u_interp = vectorfield['water_u']  # Interpolator expects (lat_idx, lon_idx)
+        # v_interp = vectorfield['water_v']
 
-        horizontal_field_velocity = u_interp([[lat_idx, lon_idx]])[0]
-        vertical_field_velocity = v_interp([[lat_idx, lon_idx]])[0]
+        # horizontal_field_velocity = u_interp([[lat_idx, lon_idx]])[0]
+        # vertical_field_velocity = v_interp([[lat_idx, lon_idx]])[0]
+
+        ### NON-linterp
+        closest_idx_lon, closest_idx_lat = findClosestIndex(vectorfield, lat, lon)
+        horizontal_field_velocity = vectorfield['water_u'][closest_idx_lon, closest_idx_lat]
+        vertical_field_velocity = vectorfield['water_v'][closest_idx_lon, closest_idx_lat]
+        ###
+
         
         self.localFlow = np.array([horizontal_field_velocity, vertical_field_velocity])
         self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
         sum_field_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
+        
 
         #Only for normalization. Flow speed determines the weight
         horiz_prob = horizontal_field_velocity / sum_field_velocity

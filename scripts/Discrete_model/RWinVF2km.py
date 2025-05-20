@@ -10,15 +10,15 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_steps = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
-N_steps_per_timestep = 100 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
+N_simulation_steps = 50 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
+N_steps_per_timestep = 10 #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
 N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25.6, 44.4]) #lon(x), lat(y)
 initial_probability = (0.174468, 0.28168, 0.09942134, 0.4444274) #lrud
-horizontalStepSize = 0.002 # Turtle step size, in degrees lat/long
-verticalStepSize = 0.002   # Turtle step size, in degrees lat/long
+horizontalStepSize = 0.02 # Turtle step size, in degrees lat/long
+verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
 startTime = 131496 #01-01-2015
@@ -74,18 +74,22 @@ for simstep, t in enumerate(simulationTimes):
     # Searchsorted finds the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
     simulationTimeIndex = np.searchsorted(times, t)+startTimeIndex
-    
-    # Make the water grid linearly interpolatable
-    u_grid = dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]  # shape (lat, lon)
-    v_grid = dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]  # shape (lat, lon)
-    
-    # Interpolators assume input in the form (lat, lon)
-    u_interp = RegularGridInterpolator((lats_idx, lons_idx), u_grid, bounds_error=False, fill_value=None)
-    v_interp = RegularGridInterpolator((lats_idx, lons_idx), v_grid, bounds_error=False, fill_value=None)
+    ### NON-linterp
+    vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]
+    vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]
 
-    # Now create a vector field dictionary with interpolators
-    vectorfield['water_u'] = u_interp
-    vectorfield['water_v'] = v_interp
+    ### Linterp
+    # # Make the water grid linearly interpolatable
+    # u_grid = dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]  # shape (lat, lon)
+    # v_grid = dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]  # shape (lat, lon)
+    
+    # # Interpolators assume input in the form (lat, lon)
+    # u_interp = RegularGridInterpolator((lats_idx, lons_idx), u_grid, bounds_error=False, fill_value=None)
+    # v_interp = RegularGridInterpolator((lats_idx, lons_idx), v_grid, bounds_error=False, fill_value=None)
+
+    # # Now create a vector field dictionary with interpolators
+    # vectorfield['water_u'] = u_interp
+    # vectorfield['water_v'] = v_interp
     
     
     for j, tutel in enumerate(Tutels):
