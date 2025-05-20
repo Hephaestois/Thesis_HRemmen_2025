@@ -11,12 +11,11 @@ dx, dy = 0.1, 0.1
 dt = 0.01
 simLengthDays = 100
 
-
 masked_matrix = np.ma.masked_less(matrix, 0.004) #5 times as much
 
 # Create a colormap and set the "bad" (masked) color to white or gray
 cmap = cm.viridis.copy()
-cmap.set_bad(color='white')  # Or 'white'
+cmap.set_bad(color='white')  # Values exceeding lower bound are seethrough.
 
 plt.figure(figsize=[8, 3], dpi=180)
 plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
