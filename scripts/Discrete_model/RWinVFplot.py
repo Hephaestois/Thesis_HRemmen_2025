@@ -9,7 +9,7 @@ from time import time
 
 # === Toggle here ===
 plot_paths = True         # Show/don't show turtle path lines
-walk_opacity = 0.01       # Only effective if plot_paths = True
+walk_opacity = 0.1       # Only effective if plot_paths = True
 
 # Load data
 with open('createdData.pkl', 'rb') as file:

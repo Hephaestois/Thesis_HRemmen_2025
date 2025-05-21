@@ -1,3 +1,6 @@
+(Opening brackets so that I can use smileys without them being marked invalid: ((((((()
+
+
 Hello Viktoria! :)
 
 # This file is meant as a log!
@@ -145,4 +148,18 @@ I have decided to determine the individual walkers' probability of movement by t
 This added term seems to increase the tutels awareness of direction, and also corrects the model's tendency for all of them to head upwards. Now I 'just' need to calibrate the flow strength and movement strenght so that the results in Painter are reproduced.
 
 I also want to make the vectorfield linearly interpolated
+
+## May 21st
+
+It has been a while since I've worked on the discrete process. I am glad I have reopened it, though!
+
+Yesterday Viktoria and I have discussed about a problem that has been on my mind regarding the position-jump process: how do I make it so that an agent swims 2km per day, if it is in a vectorfield which influences its movement without costing the turtle energy?
+
+This problem has been on my mind a lot, because ignoring this issue makes the system variant under galilean transformation. I know that these models can be used to describe brownian motion, and therefor my model should be physical, which requires invariance under galilean tranformations. See Einsteins theory of relativity for more information on this topic :)
+
+Solving this problem is very hard when looked at face-value, but when I had my realisation, it wasn't so bad! If the influence a walker has on its own movement is p, and the influence the flowfield has is f, then the probability of movement is (p+f)/(P+F) in each direction. So the walkers own contribution has become p/(P+F), so if it originally had swam 1km, now it has swam only 1/(P+F) to go the same distance. So let the turtle do more steps until SUM 1/(P+F) = 1, and suddenly it all works! what a wonderful world.
+
+Implementing this wasn't so hard, just give every turtle a counter and when its probability exceeds 1, stop its simulation until the next VF is added. Now turtles in a field go fast, and turtles not in a field go slow!
+
+Now I will move on to making a script, figures and images for my presentation tomorrow.
 

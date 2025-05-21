@@ -11,8 +11,7 @@ import pickle
 # High level stuff
 # N_tutels = 40
 N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
-N_steps_per_timestep = 1 # TODO should become irrelevant #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
-N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
+N_released_per_day = 5   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25, 44.5]) #lon(x), lat(y)
@@ -80,7 +79,7 @@ tutel = Walker(
 )
 Tutels.append(tutel)
 paths.append([])
-start_frames.append(0 * N_steps_per_timestep)  # Frame when this turtle starts walking
+start_frames.append(0)  # Frame when this turtle starts walking
   
 for i in range(N_simulation_days):
     for _ in range(N_released_per_day):
@@ -94,7 +93,7 @@ for i in range(N_simulation_days):
         )
         Tutels.append(tutel)
         paths.append([])
-        start_frames.append(i * N_steps_per_timestep)  # Frame when this turtle starts walking
+        start_frames.append(i)  # Frame when this turtle starts walking
 
     progressBar(i, N_simulation_days-1, start)    
 
