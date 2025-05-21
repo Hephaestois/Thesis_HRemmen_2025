@@ -8,8 +8,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ''
 # Other imports
 import numpy as np
 from library.structures import Grid
-from library.functions import load_data
+from library.functions import load_data, progressBar
+import time
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 from matplotlib import cm
 import pickle
 
@@ -20,6 +22,7 @@ days = 100
 fps = 10
 vmin, vmax = 0, 0.5
 output_filename = f'{year}_{days}d.mp4'
+matrix_cutoff = 0.02
 
 ### === End options ===
 
@@ -31,23 +34,28 @@ dx, dy = metadata['dx'], float(metadata['dy'])
 dt = 0.01
 simLengthDays = days
 
-masked_matrix = np.ma.masked_less(matrix, 0.02) #5 times as much
+masked_matrix = np.ma.masked_less(matrix, matrix_cutoff) #5 times as much
 
 # Create a colormap and set the "bad" (masked) color to white or gray
 cmap = cm.viridis.copy()
 cmap.set_bad(color='white')  # Values exceeding lower bound are seethrough.
 
-plt.figure(figsize=[8, 3], dpi=180)
-plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
-# Use masked matrix and custom colormap
-plt.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
-           aspect=1, vmin=vmin, vmax=vmax, cmap=cmap) #5 times as high
+fig, ax = plt.subplots(figsize=[8, 3], dpi=180)
+start = time.time()
+def update(day):
+    ax.clear()
+    matrix = load_data("pde", year, days, '0.1x0.1_0.01', day)[0]
+    masked_matrix = np.ma.masked_less(matrix, 0.02)
+    im = ax.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
+                   aspect=1, vmin=vmin, vmax=vmax, cmap=cmap)
+    ax.plot((-25), (44.5), 'r.')
+    ax.set_title(f"Day {day} | Grid step {dx}x{dy}, dt={dt}")
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    progressBar(day, simLengthDays, start)
+    return [im]
 
-# lon_grid, lat_grid = np.meshgrid(grid.x_s, grid.y_s)
-# plt.quiver(lon_grid[::3, ::3], lat_grid[::3, ::3], vf_x[::3, ::3], vf_y[::3, ::3], scale=40, color='k')
-plt.plot((-25), (44.5), 'r.')
-plt.colorbar()
-plt.xlabel('x')
-plt.ylabel('y')
-plt.savefig(f'{year}_{days}d.png')
-plt.show()
+ani = animation.FuncAnimation(fig, update, frames=range(days + 1), blit=False)
+
+ani.save(output_filename, fps=fps, dpi=180)
+plt.close()
