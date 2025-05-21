@@ -48,7 +48,7 @@ plt.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
 plt.plot((-25), (44.5), 'r.')
 plt.colorbar()
 for path in processed_paths:
-    plt.plot((path[0][-1]), (path[1][-1]), 'g.')
+    plt.plot((path[0][-1]), (path[1][-1]), 'w.', mec='k')
 plt.xlabel('x')
 plt.ylabel('y')
 plt.savefig(f'randomWalk.png')

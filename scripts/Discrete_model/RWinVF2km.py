@@ -12,7 +12,7 @@ import pickle
 # N_tutels = 40
 N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
 N_steps_per_timestep = 1 # TODO should become irrelevant #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
-N_released_per_day = 5   #Gamma=5 in Painter, amount of released tutels
+N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25, 44.5]) #lon(x), lat(y)
@@ -60,6 +60,9 @@ longitudes = lon_array[lon_idx]
 lat_mask = (lat_array >= min(y_range)-e) & (lat_array <= max(y_range)+e)
 lat_idx = np.where(lat_mask)[0]
 latitudes = lat_array[lat_idx]
+
+print(np.sum(lat_mask))
+
 
 vectorfield = dict()
 vectorfield['latitude'] = latitudes

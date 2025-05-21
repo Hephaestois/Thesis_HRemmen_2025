@@ -101,12 +101,11 @@ class Walker:
         ### NON-linterp
         closest_idx_lon, closest_idx_lat = findClosestIndex(vectorfield, lat, lon)
         
-        idx_data_lon = np.clip(np.searchsorted(vectorfield['longitude'], lon), 0, len(vectorfield['longitude']))
-        idx_data_lat = np.clip(np.searchsorted(vectorfield['latitude'], lat), 0, len(vectorfield['latitude'])-2)
+        idx_data_lon = np.clip(np.searchsorted(vectorfield['longitude'], lon), 0, len(vectorfield['longitude'])-1)
+        idx_data_lat = np.clip(np.searchsorted(vectorfield['latitude'], lat), 0, len(vectorfield['latitude'])-1)
 
-        print(lon, lat, idx_data_lon, idx_data_lat)
-        horizontal_field_velocity = vectorfield['water_u'][idx_data_lon, idx_data_lat]
-        vertical_field_velocity = vectorfield['water_v'][idx_data_lon, idx_data_lat]
+        horizontal_field_velocity = vectorfield['water_u'][idx_data_lat, idx_data_lon]
+        vertical_field_velocity = vectorfield['water_v'][idx_data_lat, idx_data_lon]
         ###
         
         
