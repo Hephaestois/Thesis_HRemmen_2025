@@ -1,3 +1,11 @@
+# Make sure we can import from the shared library and data files
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'library')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
+
+# Other imports
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 from library.functions import progressBar

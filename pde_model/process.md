@@ -119,6 +119,17 @@ To make the vectorfield-swapping functional, I need to provide the program with 
 I have gotten the Discrete model working. Tonight I want to get some tools ready to make figures and such for the presentation I need to hold tomorrow. This means I need to create video plotting programs, preferably for both the PDE and discrete models, but as a start the PDE model should be animated.
 To achieve this, first the method of saving data for the PDE model should be adapted: currently only the 'last timestep' is saved. I will not be saving each intermediate, but at least the days would be worthwhile to save. So first: revamp the method of saving.
 
+Actually zero'th step: restructure the files!
+main {
+    data
+    discrete_model
+    PDE_model
+    libraries
+    figures_discrete
+    figures_PDE
+    figures_shared
+}
+and make it so that all the python files are run from main instead of their subdirs.
 
 
 

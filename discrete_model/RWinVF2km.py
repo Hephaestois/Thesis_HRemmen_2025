@@ -1,3 +1,10 @@
+# Make sure we can import from the shared library and data files
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'library')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
+
+# Other imports
 from library.agents import Walker
 from library.functions import zipCoords, progressBar
 from scipy.interpolate import RegularGridInterpolator

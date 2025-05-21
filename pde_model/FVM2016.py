@@ -1,3 +1,11 @@
+# Make sure we can import from the shared library and data files
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'library')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
+
+# Other imports
 from library.structures import Grid
 from library.functions import progressBar
 import numpy as np
@@ -5,8 +13,6 @@ import matplotlib.pyplot as plt
 import math
 from time import time
 import netCDF4
-import os
-
 import pickle
 from matplotlib import cm
 from matplotlib.colors import Normalize

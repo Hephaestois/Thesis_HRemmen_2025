@@ -1,3 +1,11 @@
+# Make sure we can import from the shared library and data files
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'library')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
+
+# Other imports
 from library.agents import Walker
 from library.functions import zipCoords
 import matplotlib.pyplot as plt
@@ -7,24 +15,20 @@ import time
 # Swapping to Numpy, the performance (1M: 7.9s, 2M: 13.7s)
 # Actually properly vectorizing some stuff:
 #                                    (1M: 1.2s, 2M: 2.3s, 4M: 4.6s) Optimization acquired!
-plt.rcParams['axes.edgecolor'] = 'white'
-plt.rcParams['axes.facecolor'] = 'none'
-plt.rcParams['axes.labelcolor'] = 'white'
-plt.rcParams['xtick.color'] = 'white'
-plt.rcParams['ytick.color'] = 'white'
+
 
 start = time.time()
 
-walkers = 50
-steps = 1000
+plt.figure()
 
-plt.figure(figsize=(4,4),dpi=600)
-for i in range(walkers):
-    walker = Walker(probs=(0.23, 0.27, 0.25, 0.25))
-    plt.plot(*zipCoords(walker.moveNStep(steps)), alpha=0.1, color='red')
+for i in range(500):
+    walker = Walker(weight_self=1, weight_VF=0)
+    plt.plot(*zipCoords(walker.positionJumpProcess(1000)), alpha=0.01, color='red')
+
 plt.axis('equal')
 plt.axis('square')
 end = time.time()
 print(f"{1000 * (end - start)} milliseconds elapsed")
-plt.savefig(f'RRW{walkers}-{steps}MoreRightward.png', transparent=True)
-plt.savefig('randomWalkNontrans.png')
+
+plt.savefig('RRW_sample')
+plt.show()
