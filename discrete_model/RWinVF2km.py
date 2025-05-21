@@ -18,7 +18,7 @@ import pickle
 # High level stuff
 # N_tutels = 40
 N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
-N_released_per_day = 5   #Gamma=5 in Painter, amount of released tutels
+N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25, 44.5]) #lon(x), lat(y)
@@ -136,7 +136,7 @@ print('Writing data to storage...')
 with open('createdData.pkl', 'wb') as file:
     pickle.dump((paths, start_frames), file)
 
-save_data([paths, start_frames], "discrete", year, N_simulation_days, f'{horizontalStepSize}x{verticalStepSize}', 'allpositions')
+save_data([paths, start_frames], "discrete", year, N_simulation_days, f'{N_released_per_day}perday', 'allpositions')
 
 print("Done!")
 

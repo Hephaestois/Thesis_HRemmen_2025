@@ -21,7 +21,7 @@ fps = 10
 vmin, vmax = 0, 0.5
 matrix_cutoff = 0.02
 density_resolution = '0.1x0.1_0.01'
-walk_resolution = '0.02x0.02'
+walk_nperday = 1
 output_filename = f'{year}_{days}d_combined.mp4'
 
 # === Load metadata and data ===
@@ -29,7 +29,7 @@ metadata = load_data("pde", year, days, density_resolution, 'metadata')
 dx, dy = metadata['dx'], float(metadata['dy'])
 
 # Load random walk data
-paths, start_frames = load_data('discrete', str(year), str(days), walk_resolution, 'allpositions')
+paths, start_frames = load_data('discrete', str(year), str(days), f'{walk_nperday}perday', 'allpositions')
 processed_paths = [zipCoords(path) for path in paths]
 path_lengths = [len(p[0]) for p in processed_paths]
 max_steps = max(start + len(p[0]) for p, start in zip(processed_paths, start_frames))
