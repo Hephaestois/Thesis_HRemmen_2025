@@ -10,7 +10,7 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_steps = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
+N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
 N_steps_per_timestep = 1 # TODO should become irrelevant #Adds up to approx. 2km, but should get its own logic in the program because radians are not equidistant
 N_released_per_day = 5   #Gamma=5 in Painter, amount of released tutels
 
@@ -21,36 +21,45 @@ horizontalStepSize = 0.02 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
-startTime = 140_256 #01-01-2016
+startTime_1 = 140_256 #01-01-2016
 timeResolution = 24 # This is regardless of the multiples of 3 hours 
                     # the dataset works with. 
-endTime = startTime + timeResolution*N_simulation_steps
+endTime = startTime_1 + timeResolution*N_simulation_days
 
 
 # Spatial dataset related stuff. #lat and #long should be the same length, delta is used to accomodate for this.
 longitude_data_stepsize = 1 #Multiples of 0.04 degree
 latitude_data_stepsize  = 1 #Multiples of 0.08 degree
 delta = 0                   #For correcting size mismatch in latitudes/longitudes.
+x_range = (-29, -11)
+y_range = (42, 47)
 
 ### END of options
 
 start = time.time()
 url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
-dataset = netCDF4.Dataset(url)
+dataset1 = netCDF4.Dataset(url)
+e=1e-3
 
-lons_idx = range(1885,2113,longitude_data_stepsize)
-lats_idx = range(2050,2176-delta,latitude_data_stepsize)
-lons_idx = range(1880,2120,longitude_data_stepsize)
-lats_idx = range(2040,2180-delta,latitude_data_stepsize)
+time_array_1 = dataset1.variables['time'][:]
 
-# These three are pretty important, as they are used to precompute some stuff, best saved locally
-longitudes = dataset.variables['lon'][lons_idx] # Range -29.2, -11.28
-latitudes = dataset.variables['lat'][lats_idx]  # Range 42.0, 46.48
-times = [j for j in [i for i in dataset.variables['time'][:] if i >= startTime] if j <= endTime]
-simulationTimes = list(range(startTime, endTime, 24))
-startTimeIndex = list(dataset.variables['time'][:]).index(startTime)
+lon_array = dataset1.variables['lon'][:]
+lat_array = dataset1.variables['lat'][:]
 
-print(min(longitudes), max(longitudes), min(latitudes), max(latitudes))
+time_mask_1 = (time_array_1 >= startTime_1) & (time_array_1 <= endTime)
+time_idx_1 = np.where(time_mask_1)[0]
+times_1 = time_array_1[time_idx_1]
+startTimeIndex_1 = list(time_array_1).index(startTime_1)
+
+# Longitude indices and values
+lon_mask = (lon_array >= min(x_range)-e) & (lon_array <= max(x_range)+e)
+lon_idx = np.where(lon_mask)[0]
+longitudes = lon_array[lon_idx]
+
+# Latitude indices and values
+lat_mask = (lat_array >= min(y_range)-e) & (lat_array <= max(y_range)+e)
+lat_idx = np.where(lat_mask)[0]
+latitudes = lat_array[lat_idx]
 
 vectorfield = dict()
 vectorfield['latitude'] = latitudes
@@ -69,29 +78,31 @@ tutel = Walker(
 Tutels.append(tutel)
 paths.append([])
 start_frames.append(0 * N_steps_per_timestep)  # Frame when this turtle starts walking
-
-
-for simstep, t in enumerate(simulationTimes):
+  
+for i in range(N_simulation_days):
     for _ in range(N_released_per_day):
         tutel = Walker(
             init_position=startpos,
             init_probs=initial_probability,
             horizontalStepSize=horizontalStepSize, 
-            verticalStepSize=verticalStepSize
+            verticalStepSize=verticalStepSize,
+            lon_vals = dataset1.variables['lon'][lon_idx],
+            lat_vals = dataset1.variables['lat'][lat_idx]   
         )
         Tutels.append(tutel)
         paths.append([])
-        start_frames.append(simstep * N_steps_per_timestep)  # Frame when this turtle starts walking
+        start_frames.append(i * N_steps_per_timestep)  # Frame when this turtle starts walking
 
-    progressBar(simstep, N_simulation_steps-1, start)    
+    progressBar(i, N_simulation_days-1, start)    
 
     # Searchsorted finds the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
-    simulationTimeIndex = np.searchsorted(times, t)+startTimeIndex
+    simulationTimeIndex = np.searchsorted(times_1, startTime_1+i*timeResolution)+startTimeIndex_1
     ### NON-linterp
-    vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lats_idx, lons_idx]
-    vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lats_idx, lons_idx]
-    
+
+    vectorfield['water_u']=dataset1.variables['water_u'][simulationTimeIndex, 0, lat_idx, lon_idx]
+    vectorfield['water_v']=dataset1.variables['water_v'][simulationTimeIndex, 0, lat_idx, lon_idx]
+
     for j, tutel in enumerate(Tutels):
         if tutel.finished:
             continue
