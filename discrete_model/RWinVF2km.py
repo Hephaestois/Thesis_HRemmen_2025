@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ''
 
 # Other imports
 from library.agents import Walker
-from library.functions import zipCoords, progressBar
+from library.functions import zipCoords, progressBar, save_data
 from scipy.interpolate import RegularGridInterpolator
 import matplotlib.pyplot as plt
 import time
@@ -43,6 +43,7 @@ y_range = (42, 47)
 ### END of options
 
 start = time.time()
+year=2016
 url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
 dataset1 = netCDF4.Dataset(url)
 e=1e-3
@@ -111,7 +112,7 @@ for i in range(N_simulation_days):
 
     vectorfield['water_u']=dataset1.variables['water_u'][simulationTimeIndex, 0, lat_idx, lon_idx]
     vectorfield['water_v']=dataset1.variables['water_v'][simulationTimeIndex, 0, lat_idx, lon_idx]
-
+    
     for j, tutel in enumerate(Tutels):
         if tutel.finished:
             continue
@@ -127,13 +128,15 @@ for i in range(N_simulation_days):
         # Position is logged at the end of the day, when the turtles have finished moving. This means in the animation, the turtle step will not be equidistant!!
         # But per simulation step, this works out fine.
         paths[j].append(tutel.position)
-            
+        
 print(paths)
 
 print('Writing data to storage...')
 # Save the data so we can do graphical stuff on it.
 with open('createdData.pkl', 'wb') as file:
     pickle.dump((paths, start_frames), file)
+
+save_data([paths, start_frames], "discrete", year, N_simulation_days, f'{horizontalStepSize}x{verticalStepSize}', 'allpositions')
 
 print("Done!")
 

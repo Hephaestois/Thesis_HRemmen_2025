@@ -113,7 +113,7 @@ def save_data(obj, label, year, n_days, resolution_args, day):
 
     Parameters:
     - obj: the Python object to pickle
-    - label: subdirectory label under data/ (e.g., 'model1_output')
+    - label: subdirectory label under data/ ("PDE" or "discrete")
     - year: year of the dataset (e.g., 2020)
     - n_days: number of days total (e.g., 365)
     - resolution_args: string describing resolution params (e.g., '5min_agg')
@@ -122,7 +122,6 @@ def save_data(obj, label, year, n_days, resolution_args, day):
     
     if label != "pde" and label != "discrete":
         print("Are you sure the save location is correct?")
-        return
     
     # Get project root (head/)
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

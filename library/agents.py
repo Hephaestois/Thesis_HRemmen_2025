@@ -55,8 +55,8 @@ class Walker:
         TODO: Study how the parameter localFlowSpeed should be chosen for 'correct' performance. Currently =1 does not sound any mental alarms.
         '''
         # Correction factor for the localFlowSpeed, because of unit conversions. Currently unused (=1)
-        flowSpeedMultiplier = 86.4/1
-        walkerMultiplier = 1
+        flowSpeedMultiplier = 86.4/3
+        walkerMultiplier = 3
         
         normalization = walkerMultiplier + flowSpeedMultiplier*np.sum(self.localFlow)
         
