@@ -138,4 +138,67 @@ def save_data(obj, label, year, n_days, resolution_args, day):
     with open(filepath, 'wb') as f:
         pickle.dump(obj, f)
 
-    print(f"Saved: {filepath}")
+    # print(f"Saved: {filepath}")
+    
+    
+def load_data(label, year, n_days, resolution_args, day):
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    subfolder = f"{year}_{n_days}d_{resolution_args}"
+    filepath = os.path.join(base_dir, 'data', label, subfolder, f"{day}.pkl")
+
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"File not found: {filepath}")
+
+    with open(filepath, 'rb') as f:
+        return pickle.load(f)
+    
+import os
+import matplotlib.pyplot as plt
+
+def save_figure(fig, filename, subfolder=None):
+    """
+    Save a matplotlib figure to the pde_figures/ directory.
+
+    Parameters:
+    - fig: the matplotlib figure object
+    - filename: name of the file to save (e.g., 'solution_plot.png')
+    - subfolder: optional subfolder inside pde_figures/ (e.g., '2024')
+    """
+    # Get the base directory (head/)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    # Build the full path to the output folder
+    out_dir = os.path.join(base_dir, 'pde_figures')
+    if subfolder:
+        out_dir = os.path.join(out_dir, subfolder)
+    
+    os.makedirs(out_dir, exist_ok=True)  # ensure the folder exists
+
+    fig_path = os.path.join(out_dir, filename)
+    fig.savefig(fig_path, bbox_inches='tight', dpi=300)
+    print(f"Figure saved to: {fig_path}")
+    
+import os
+
+def save_animation(anim, filename, subfolder=None, fps=30):
+    """
+    Save a matplotlib animation to the pde_figures/ directory.
+
+    Parameters:
+    - anim: the animation object (e.g., from FuncAnimation)
+    - filename: name of the output file (e.g., 'wave.mp4' or 'wave.gif')
+    - subfolder: optional subfolder inside pde_figures/
+    - fps: frames per second for the animation
+    """
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    out_dir = os.path.join(base_dir, 'pde_figures')
+    if subfolder:
+        out_dir = os.path.join(out_dir, subfolder)
+    os.makedirs(out_dir, exist_ok=True)
+
+    filepath = os.path.join(out_dir, filename)
+
+    # Save animation
+    anim.save(filepath, writer='ffmpeg', fps=fps)
+    print(f"Animation saved to: {filepath}")
+

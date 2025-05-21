@@ -99,10 +99,8 @@ N_steps_per_day = int(1/dt)
 #
 ### Start main loop
 #
-
-matrix=grid.getMatrix()
-vf_x, vf_y = grid.getVectorField(dataset, lon_idx, lat_idx, 0) #At the start of every 24 hours.
-save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 0)
+metadata = {'dx': dx, 'dy': dx, 'dt': dt}
+save_data(metadata, 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 'metadata')
 
 start_time = time()
 for i in range(simLengthDays):
@@ -114,40 +112,44 @@ for i in range(simLengthDays):
     
     #To plot a quiver later
     vf_x, vf_y = grid.getVectorField(dataset, lon_idx, lat_idx, simTimeIndex) #At the start of every 24 hours.
-        
+    matrix = grid.getMatrix()
+
+    save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', i)
+    
     for j in range(N_steps_per_day):
-        grid.timeStep(diffusion=False, constantAdvection=True, VFAdvection=False)
+        grid.timeStep(diffusion=False, constantAdvection=True, VFAdvection=True)
         progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
     
-    matrix = grid.getMatrix()
-    save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 0)
+    
+matrix = grid.getMatrix()
+save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', simLengthDays)
 
 
-with open('matrix.pkl', 'wb') as f:
-    pickle.dump(matrix, f)
 
-print('Overflow Ratio:', grid.getOverflowRatio())
-print('Overflow through bottom:', grid.getOverflowBottom())
+### TO BE REMOVED - still here because of copying later purposes.
 
-masked_matrix = np.ma.masked_less(matrix, 0.01)
+# print('Overflow Ratio:', grid.getOverflowRatio())
+# print('Overflow through bottom:', grid.getOverflowBottom())
 
-# Create a colormap and set the "bad" (masked) color to white or gray
-cmap = cm.viridis.copy()
-cmap.set_bad(color='white')  # Or 'white'
+# masked_matrix = np.ma.masked_less(matrix, 0.01)
 
-plt.figure(figsize=[8, 3], dpi=180)
-plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
-# Use masked matrix and custom colormap
-plt.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
-           aspect=1, vmin=0.01, vmax=np.max(matrix), cmap=cmap)
+# # Create a colormap and set the "bad" (masked) color to white or gray
+# cmap = cm.viridis.copy()
+# cmap.set_bad(color='white')  # Or 'white'
 
-lon_grid, lat_grid = np.meshgrid(grid.x_s, grid.y_s)
-plt.quiver(lon_grid[::quiver_step, ::quiver_step], lat_grid[::quiver_step, ::quiver_step], vf_x[::quiver_step, ::quiver_step], vf_y[::quiver_step, ::quiver_step], scale=40, color='k')
-plt.plot((-25), (44.5), 'r.')
-plt.colorbar()
-plt.xlabel('x')
-plt.ylabel('y')
-plt.savefig('densityplot.png')
-plt.show()
+# plt.figure(figsize=[8, 3], dpi=180)
+# plt.title(f"Grid step {dx}x{dy}, dt={dt}. {simLengthDays} days simulation")
+# # Use masked matrix and custom colormap
+# plt.imshow(masked_matrix, origin='lower', extent=[-29, -11, 42, 47],
+#            aspect=1, vmin=0.01, vmax=np.max(matrix), cmap=cmap)
+
+# lon_grid, lat_grid = np.meshgrid(grid.x_s, grid.y_s)
+# plt.quiver(lon_grid[::quiver_step, ::quiver_step], lat_grid[::quiver_step, ::quiver_step], vf_x[::quiver_step, ::quiver_step], vf_y[::quiver_step, ::quiver_step], scale=40, color='k')
+# plt.plot((-25), (44.5), 'r.')
+# plt.colorbar()
+# plt.xlabel('x')
+# plt.ylabel('y')
+# plt.savefig('densityplot.png')
+# plt.show()
 
 
