@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ''
 
 # Other imports
 from library.structures import Grid
-from library.functions import progressBar
+from library.functions import progressBar, save_data
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -36,8 +36,8 @@ dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
 dt = 0.01 # timestep between dataset swapping. scale: day.
 simLengthDays = 100
 
-
 ### Related to dataset time and VF
+year = 2016
 startTime = 140256      #Hours since 01-01-2000. This repr. 01-01-2016
 timeResolution = 24     #Hours between dataset snapshots. Intermediate timesteps use identical set.
 endTime = startTime + timeResolution * simLengthDays
@@ -100,6 +100,10 @@ N_steps_per_day = int(1/dt)
 ### Start main loop
 #
 
+matrix=grid.getMatrix()
+vf_x, vf_y = grid.getVectorField(dataset, lon_idx, lat_idx, 0) #At the start of every 24 hours.
+save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 0)
+
 start_time = time()
 for i in range(simLengthDays):
     if initialCondition == 'inflow':
@@ -114,9 +118,10 @@ for i in range(simLengthDays):
     for j in range(N_steps_per_day):
         grid.timeStep(diffusion=False, constantAdvection=True, VFAdvection=False)
         progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
+    
+    matrix = grid.getMatrix()
+    save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 0)
 
-
-matrix = grid.getMatrix()
 
 with open('matrix.pkl', 'wb') as f:
     pickle.dump(matrix, f)

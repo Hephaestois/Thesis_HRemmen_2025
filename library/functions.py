@@ -3,6 +3,8 @@ import pandas as pd
 import sys
 import time
 import random
+import pickle
+import os
 
 def zipCoords(steps):
     '''A function to convert a list of steps into a list of x and y coordinates for plotting'''
@@ -104,3 +106,36 @@ def progressBar(progress, max, start_time, bar_length=40, comment=False, comment
 
     if progress == max:
         print()  # Move to next line on completion
+        
+def save_data(obj, label, year, n_days, resolution_args, day):
+    """
+    Save data to data/{label}/{year}_{n_days}_{resolution_args}/{day}.pkl
+
+    Parameters:
+    - obj: the Python object to pickle
+    - label: subdirectory label under data/ (e.g., 'model1_output')
+    - year: year of the dataset (e.g., 2020)
+    - n_days: number of days total (e.g., 365)
+    - resolution_args: string describing resolution params (e.g., '5min_agg')
+    - day: the day number/file name (e.g., 15)
+    """
+    
+    if label != "pde" and label != "discrete":
+        print("Are you sure the save location is correct?")
+        return
+    
+    # Get project root (head/)
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    # Construct the path
+    subfolder = f"{year}_{n_days}d_{resolution_args}"
+    target_dir = os.path.join(base_dir, 'data', label, subfolder)
+    os.makedirs(target_dir, exist_ok=True)
+
+    filepath = os.path.join(target_dir, f"{day}.pkl")
+
+    # Save using pickle
+    with open(filepath, 'wb') as f:
+        pickle.dump(obj, f)
+
+    print(f"Saved: {filepath}")
