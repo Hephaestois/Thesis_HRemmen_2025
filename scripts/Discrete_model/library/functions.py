@@ -11,6 +11,13 @@ def zipCoords(steps):
 def chooseDirection(cumProbs):
     '''Converts from a cumulative probability list lrud to a direction chosen according to those probabilities.'''
     randomNumber = random.random()
+    e = 1e-4
+    
+    for v in cumProbs:
+        if v>1 or v<0:
+            raise("Impossible probability was found!!!!!")
+    if cumProbs[3] < 1-e or cumProbs[3] > 1+e:
+        raise(f"invalid sum of probs found!!!! {cumProbs[3]}")
     
     if randomNumber <= cumProbs[0]:
         return np.array([-1, 0])

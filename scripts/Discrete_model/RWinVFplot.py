@@ -36,7 +36,7 @@ for x, y in processed_paths:
     line, = ax.plot([], [], color='red', alpha=walk_opacity if plot_paths else 0.0)
     dot, = ax.plot([], [], 'go')    # green current dot
     cross, = ax.plot([], [], 'kx')  # black X at end
-    start, = ax.plot(-25.6, 44.4, 'ko')  # black dot at start (static)
+    start, = ax.plot(-25, 44.5, 'ko')  # black dot at start (static)
     lines.append(line)
     dots.append(dot)
     crosses.append(cross)
@@ -79,9 +79,9 @@ def update(frame):
 
 print("Starting animation...")
 # Create animation
-anim = FuncAnimation(fig, update, frames=max_steps, interval=20, blit=True)
+anim = FuncAnimation(fig, update, frames=max_steps, interval=100, blit=True)
 
 # Save video
-writer = FFMpegWriter(fps=50)
+writer = FFMpegWriter(fps=10)
 anim.save("randomWalkAnimation.mp4", writer=writer)
 print('Finished')

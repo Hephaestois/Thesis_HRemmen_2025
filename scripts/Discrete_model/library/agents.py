@@ -38,6 +38,7 @@ class Walker:
         
         #Has the turtle hit a border?
         self.finished = False
+        self.probdistance = 0
         
         
     def moveRandom(self):
@@ -50,13 +51,16 @@ class Walker:
         TODO: Study how the parameter localFlowSpeed should be chosen for 'correct' performance. Currently =1 does not sound any mental alarms.
         '''
         # Correction factor for the localFlowSpeed, because of unit conversions. Currently unused (=1)
-        flowSpeedMultiplier = 3
+        flowSpeedMultiplier = 30
         walkerMultiplier = 1
         
+        normalization = walkerMultiplier + flowSpeedMultiplier*np.sum(self.localFlow)
+        
         # The self.localFlow is a lrud vector of the flow components. There are two zeros, in the direction where the flow points away from.
-        weightedProbs = np.divide(walkerMultiplier*self.initProbs+flowSpeedMultiplier*self.localFlow, walkerMultiplier + flowSpeedMultiplier*np.sum(self.localFlow))
+        weightedProbs = np.divide(walkerMultiplier*self.initProbs+flowSpeedMultiplier*self.localFlow, normalization)
         weightedCumProbs = np.cumsum(weightedProbs)
-
+        self.probdistance += 1/normalization
+        
         # This function chooses a direction based on the probabilities. The outer makes it respect the specified grid size.
         direction = self.directionToStep(chooseDirection(weightedCumProbs)) #This is a coordinate, unit direction.
         self.position += direction
@@ -90,25 +94,15 @@ class Walker:
         lon = self.position[0]
         lat = self.position[1]
         
-        ### LINterp
-        # Get decimal (lat_idx, lon_idx) position
-        # lon_idx, lat_idx = positionToIndex(vectorfield, lon, lat)
-
-        # # Interpolate u, v using RegularGridInterpolator
-        # u_interp = vectorfield['water_u']  # Interpolator expects (lat_idx, lon_idx)
-        # v_interp = vectorfield['water_v']
-
-        # horizontal_field_velocity = u_interp([[lat_idx, lon_idx]])[0]
-        # vertical_field_velocity = v_interp([[lat_idx, lon_idx]])[0]
-
+        
         ### NON-linterp
         closest_idx_lon, closest_idx_lat = findClosestIndex(vectorfield, lat, lon)
+
         horizontal_field_velocity = vectorfield['water_u'][closest_idx_lon, closest_idx_lat]
         vertical_field_velocity = vectorfield['water_v'][closest_idx_lon, closest_idx_lat]
         ###
-
         
-        self.localFlow = np.array([horizontal_field_velocity, vertical_field_velocity])
+        #self.localFlow = np.array([horizontal_field_velocity, vertical_field_velocity])
         self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
         sum_field_velocity = np.abs(horizontal_field_velocity) + np.abs(vertical_field_velocity)
         
@@ -123,14 +117,14 @@ class Walker:
                 self.localFlow = np.array([0, horizontal_field_velocity, vertical_field_velocity, 0])
             else:
                 self.probs = np.array([0, horiz_prob, 0, vert_prob])
-                self.localFlow = np.array([0, horizontal_field_velocity, 0, vertical_field_velocity])
+                self.localFlow = np.array([0, horizontal_field_velocity, 0, -vertical_field_velocity])
         else:
             if vertical_field_velocity >= 0:
                 self.probs = np.array([horiz_prob, 0, vert_prob, 0])
-                self.localFlow = np.array([horizontal_field_velocity, 0, vertical_field_velocity, 0])
+                self.localFlow = np.array([-horizontal_field_velocity, 0, vertical_field_velocity, 0])
             else:
                 self.probs = np.array([horiz_prob, 0, 0, vert_prob])
-                self.localFlow = np.array([horizontal_field_velocity, 0, 0, vertical_field_velocity])
+                self.localFlow = np.array([-horizontal_field_velocity, 0, 0, -vertical_field_velocity])
         self.cumProbs = np.cumsum(self.probs)
 
     def directionToStep(self, direction):
