@@ -17,6 +17,7 @@ class Walker:
             init_probs=(0.25, 0.25, 0.25, 0.25), 
             orientationFunction=lambda x: 0, 
             horizontalStepSize=1, verticalStepSize=1, 
+            lon_vals=None, lat_vals=None
                 ):
         
         self.position = np.array(init_position)   # The coordinate where our walker is
@@ -35,6 +36,9 @@ class Walker:
         self.verticalStepSize = verticalStepSize
         self.localFlowSpeed = 0
         self.localFlow = np.array([0,0])
+        
+        self.lon_vals = lon_vals
+        self.lat_vals = lat_vals
         
         #Has the turtle hit a border?
         self.finished = False
@@ -94,13 +98,18 @@ class Walker:
         lon = self.position[0]
         lat = self.position[1]
         
-        
         ### NON-linterp
         closest_idx_lon, closest_idx_lat = findClosestIndex(vectorfield, lat, lon)
+        
+        idx_data_lon = np.clip(np.searchsorted(vectorfield['longitude'], lon), 0, len(vectorfield['longitude']))
+        idx_data_lat = np.clip(np.searchsorted(vectorfield['latitude'], lat), 0, len(vectorfield['latitude'])-2)
 
-        horizontal_field_velocity = vectorfield['water_u'][closest_idx_lon, closest_idx_lat]
-        vertical_field_velocity = vectorfield['water_v'][closest_idx_lon, closest_idx_lat]
+        print(lon, lat, idx_data_lon, idx_data_lat)
+        horizontal_field_velocity = vectorfield['water_u'][idx_data_lon, idx_data_lat]
+        vertical_field_velocity = vectorfield['water_v'][idx_data_lon, idx_data_lat]
         ###
+        
+        
         
         #self.localFlow = np.array([horizontal_field_velocity, vertical_field_velocity])
         self.localFlowSpeed = np.sqrt(np.square(horizontal_field_velocity)+np.square(vertical_field_velocity))
