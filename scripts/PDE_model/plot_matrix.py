@@ -5,7 +5,7 @@ from matplotlib import cm
 import pickle
 
 year = 2016
-days = 300
+days = 50
 
 with open(f'{year}_{days}d_matrix.pkl', 'rb') as f:
     matrix = pickle.load(f)
