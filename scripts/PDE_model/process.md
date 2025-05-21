@@ -114,6 +114,10 @@ I am currently running a simulation at the 0.04x0.04x0.001 scale. This is quite 
 (written on 19 may, for future hazel)
 To make the vectorfield-swapping functional, I need to provide the program with the multiple URLs the data is being acquired from, and switch them when 'time runs out'. The time variable still needs to remain within the permissible steps on which the data is defined. This means that I will need a pretty bulky amount of logic, which I mmight wrap in a separate function if it is not too outlandishly complicated.
 
+# 21 may
+
+I have gotten the Discrete model working. Tonight I want to get some tools ready to make figures and such for the presentation I need to hold tomorrow. This means I need to create video plotting programs, preferably for both the PDE and discrete models, but as a start the PDE model should be animated.
+To achieve this, first the method of saving data for the PDE model should be adapted: currently only the 'last timestep' is saved. I will not be saving each intermediate, but at least the days would be worthwhile to save. So first: revamp the method of saving.
 
 
 
