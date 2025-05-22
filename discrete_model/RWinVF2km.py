@@ -17,8 +17,8 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
-N_released_per_day = 1   #Gamma=5 in Painter, amount of released tutels
+N_simulation_days = 101 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
+N_released_per_day = 2   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([-25, 44.5]) #lon(x), lat(y)

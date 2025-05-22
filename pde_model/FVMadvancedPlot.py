@@ -22,7 +22,7 @@ from matplotlib.colors import Normalize
 #
 
 ### Related to constants
-diffusionMatrix = [[0.00456, 0], [0, 0.00544]] #Converted to NParray later. Diffusion behaviour
+diffusionMatrix = [[0.000456, 0], [0, 0.000544]] #Converted to NParray later. Diffusion behaviour
 advectionVector = [0.108, -0.345] #Converted to NP later. Only defines direction, length is set using advectionWeight (analog to swimspeed!!!)
 km_travel_per_day = 2 # Daily swimming distance
 advectionWeight = km_travel_per_day/100 
@@ -34,7 +34,7 @@ y_range = [42, 47]
 dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
 dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
 dt = 0.01 # timestep between dataset swapping. scale: day.
-simLengthDays = 100
+simLengthDays = 101
 
 ### Related to dataset time and VF
 year = 2016
@@ -105,7 +105,7 @@ save_data(metadata, 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 'metadata')
 start_time = time()
 for i in range(simLengthDays):
     if initialCondition == 'inflow':
-        grid.addValue(grid.cti(-25, 44.5), 5)
+        grid.addValue(grid.cti(-25, 44.5), 0.5)
     
     simTime = startTime + i*timeResolution #Hours since 2000
     simTimeIndex = np.searchsorted(times, simTime) + startTimeIndex #To access dataset
@@ -117,7 +117,7 @@ for i in range(simLengthDays):
     save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', i)
     
     for j in range(N_steps_per_day):
-        grid.timeStep(diffusion=False, constantAdvection=True, VFAdvection=True)
+        grid.timeStep(diffusion=True, constantAdvection=True, VFAdvection=False)
         progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
     
     

@@ -18,7 +18,7 @@ import pickle
 ### === Options ===
 
 year = 2016
-days = 100
+days = 101
 fps = 10
 vmin, vmax = 0, 0.5
 output_filename = f'{year}_{days}d.mp4'
@@ -42,6 +42,7 @@ cmap.set_bad(color='white')  # Values exceeding lower bound are seethrough.
 
 fig, ax = plt.subplots(figsize=[8, 3], dpi=180)
 start = time.time()
+
 def update(day):
     ax.clear()
     matrix = load_data("pde", year, days, '0.1x0.1_0.01', day)[0]

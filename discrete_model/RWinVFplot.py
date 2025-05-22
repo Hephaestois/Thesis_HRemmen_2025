@@ -22,7 +22,7 @@ walk_opacity = 0.1       # Only effective if plot_paths = True
 # # Load data
 # with open('createdData.pkl', 'rb') as file:
 #     paths, start_frames = pickle.load(file)
-paths, start_frames = load_data('discrete', '2016', '100', '0.02x0.02', 'allpositions')
+paths, start_frames = load_data('discrete', '2016', '101', '2perday', 'allpositions')
 
 # Prepare figure
 fig, ax = plt.subplots(figsize=[10, 4], dpi=150)
@@ -42,7 +42,7 @@ starts = []
 
 for x, y in processed_paths:
     line, = ax.plot([], [], color='red', alpha=walk_opacity if plot_paths else 0.0)
-    dot, = ax.plot([], [], 'go')    # green current dot
+    dot, = ax.plot([], [], marker='o', markerfacecolor='white', markeredgecolor='black', markersize=4, linestyle='None')
     cross, = ax.plot([], [], 'kx')  # black X at end
     start, = ax.plot(-25, 44.5, 'ko')  # black dot at start (static)
     lines.append(line)
