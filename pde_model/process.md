@@ -131,6 +131,9 @@ main {
 }
 and make it so that all the python files are run from main instead of their subdirs.
 
+# 22 may
+
+Let it be known: Today (2PM) is the presentation and I haven't started yet as of 8:45AM. I need to create slides, finish my text and learn my text. 
 
 
 # List of attendees/invites for the final presentation: (who still need to know a location)

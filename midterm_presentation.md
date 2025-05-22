@@ -11,11 +11,11 @@ Formal introduction:
 You can derivate from a position-jump the advection-diffusion equation. Therefor, in simulation, they should yield the same results, right?
 Also mention what I mean by advection and diffusion. 'Directed and random movement'?
 
-Position Jump model:
-What is a position jump process? How do the model iterations look? And how is it implemented?
-
 PDE model:
 What is the FAAD model? How do its modelling iterations look like?
+
+Position Jump model:
+What is a position jump process? How do the model iterations look? And how is it implemented?
 
 Do the models agree?
 Yes! And why! Show the pitfalls and the victories!
