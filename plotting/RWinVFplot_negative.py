@@ -28,7 +28,7 @@ paths, start_frames = load_data('discrete', f'{year}', f'{ndays}', '2perday', 'a
 
 # Prepare figure
 fig, ax = plt.subplots(figsize=[10, 4], dpi=150)
-ax.set_xlim(331, 349)
+ax.set_xlim(-29, -11)
 ax.set_ylim(42, 47)
 
 # Preprocess paths
@@ -46,7 +46,7 @@ for x, y in processed_paths:
     line, = ax.plot([], [], color='red', alpha=walk_opacity if plot_paths else 0.0)
     dot, = ax.plot([], [], marker='o', markerfacecolor='white', markeredgecolor='black', markersize=4, linestyle='None')
     cross, = ax.plot([], [], 'kx')  # black X at end
-    start, = ax.plot(335, 44.5, 'ko')  # black dot at start (static)
+    start, = ax.plot(-25, 44.5, 'ko')  # black dot at start (static)
     lines.append(line)
     dots.append(dot)
     crosses.append(cross)

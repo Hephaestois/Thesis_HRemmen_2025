@@ -29,6 +29,7 @@ verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
 startTime_1 = 140_256 #01-01-2016
+startTime_2 = 143_184
 timeResolution = 24 # This is regardless of the multiples of 3 hours 
                     # the dataset works with. 
 endTime = startTime_1 + timeResolution*N_simulation_days
@@ -38,26 +39,37 @@ endTime = startTime_1 + timeResolution*N_simulation_days
 longitude_data_stepsize = 1 #Multiples of 0.04 degree
 latitude_data_stepsize  = 1 #Multiples of 0.08 degree
 delta = 0                   #For correcting size mismatch in latitudes/longitudes.
-x_range = (331, 349)
+x_range = (-29,-11)
 y_range = (42, 47)
 
 ### END of options
 
 start = time.time()
 year=2016
-url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
-dataset1 = netCDF4.Dataset(url)
+url1 = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+url2 = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_57.2'
+dataset1 = netCDF4.Dataset(url1)
+dataset2 = netCDF4.Dataset(url2)
 e=1e-3
 
 time_array_1 = dataset1.variables['time'][:]
+time_array_2 = dataset2.variables['time'][:]
 
 lon_array = dataset1.variables['lon'][:]
 lat_array = dataset1.variables['lat'][:]
 
+# Time indices for timeset 1
 time_mask_1 = (time_array_1 >= startTime_1) & (time_array_1 <= endTime)
 time_idx_1 = np.where(time_mask_1)[0]
 times_1 = time_array_1[time_idx_1]
 startTimeIndex_1 = list(time_array_1).index(startTime_1)
+
+# Time indices for timeset 2
+time_mask_2 = (time_array_2 >= startTime_2) & (time_array_2 <= endTime)
+time_idx_2 = np.where(time_mask_2)[0]
+times_2 = time_array_2[time_idx_2]
+startTimeIndex_2 = list(time_array_2).index(startTime_2)
+
 
 # Longitude indices and values
 lon_mask = (lon_array >= min(x_range)-e) & (lon_array <= max(x_range)+e)
@@ -105,13 +117,18 @@ for i in range(N_simulation_days):
 
     progressBar(i, N_simulation_days-1, start)    
 
-    # Searchsorted finds the place t would be put to maintain order. 
-    # So this is the closest value to t that is no larger than t.
-    simulationTimeIndex = np.searchsorted(times_1, startTime_1+i*timeResolution)+startTimeIndex_1
-    ### NON-linterp
-
-    vectorfield['water_u']=dataset1.variables['water_u'][simulationTimeIndex, 0, lat_idx, lon_idx]
-    vectorfield['water_v']=dataset1.variables['water_v'][simulationTimeIndex, 0, lat_idx, lon_idx]
+    simTime = startTime_1 + i*timeResolution
+    if simTime < startTime_2:
+        # Searchsorted finds the place t would be put to maintain order. 
+        # So this is the closest value to t that is no larger than t.    
+        simulationTimeIndex = np.searchsorted(times_1, simTime) + startTimeIndex_1 #To access dataset
+        dataset = dataset1
+    else:
+        simulationTimeIndex = np.searchsorted(times_2, simTime) + startTimeIndex_2 #To access dataset
+        dataset = dataset2
+    
+    vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lat_idx, lon_idx]
+    vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lat_idx, lon_idx]
     
     for j, tutel in enumerate(Tutels):
         if tutel.finished:

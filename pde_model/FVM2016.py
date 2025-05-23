@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ''
 
 # Other imports
 from library.structures import Grid
-from library.functions import progressBar
+from library.functions import progressBar, save_data
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -35,7 +35,7 @@ y_range = [42, 47]
 dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
 dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
 dt = 0.01 # timestep between dataset swapping. scale: day.
-simLengthDays = 100
+simLengthDays = 300
 year = 2016 #For naming dataset, should only be changed between files.
 
 
@@ -112,6 +112,8 @@ N_steps_per_day = int(1/dt)
 #
 ### Start main loop
 #
+metadata = {'dx': dx, 'dy': dx, 'dt': dt}
+save_data(metadata, 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 'metadata')
 
 start_time = time()
 for i in range(simLengthDays):
@@ -128,16 +130,15 @@ for i in range(simLengthDays):
     
     #To plot a quiver later
     vf_x, vf_y = grid.getVectorField(dataset, lon_idx, lat_idx, simTimeIndex) #At the start of every 24 hours.
-        
+    save_data([grid.getMatrix(), vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', i)
+
     for j in range(N_steps_per_day):
         grid.timeStep(diffusion=True, constantAdvection=True, VFAdvection=True)
         progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
 
 
-matrix = grid.getMatrix()
+save_data([grid.getMatrix(), vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', simLengthDays)
 
-with open(f'{year}_{simLengthDays}d_matrix.pkl', 'wb') as f:
-    pickle.dump(matrix, f)
 
 # print('Overflow Ratio:', grid.getOverflowRatio())
 # print('Overflow through bottom:', grid.getOverflowBottom())

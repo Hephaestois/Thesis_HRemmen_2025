@@ -15,14 +15,15 @@ from library.functions import load_data, progressBar, zipCoords
 import time
 
 # === Configuration ===
-year = 2020
-days = 100
+year = 2016
+days = 300
 fps = 10
 vmin, vmax = 0, 0.5
 matrix_cutoff = 0.02
 density_resolution = '0.1x0.1_0.01'
 walk_nperday = 2
 output_filename = f'{year}_{days}d_combined.mp4'
+offset = 0 #360 for degrees East, 0 for West
 
 # === Load metadata and data ===
 metadata = load_data("pde", year, days, density_resolution, 'metadata')
@@ -36,8 +37,8 @@ max_steps = max(start + len(p[0]) for p, start in zip(processed_paths, start_fra
 
 # === Setup Figure ===
 fig, ax = plt.subplots(figsize=[10, 4], dpi=150)
-ax.set_xlim(360-29, 360-11.5)
-ax.set_ylim(41.5, 47)
+ax.set_xlim(offset-29, offset-11)
+ax.set_ylim(42, 47)
 
 # Set up colormap for density field
 cmap = cm.viridis.copy()
@@ -45,7 +46,7 @@ cmap.set_bad(color='white')
 
 # === Prepare plot elements ===
 # Density image (reused)
-density_img = ax.imshow(np.zeros((10, 10)), origin='lower', extent=[360-29, 360-11, 42, 47],
+density_img = ax.imshow(np.zeros((10, 10)), origin='lower', extent=[offset-29, offset-11, 42, 47],
                         aspect=1, vmin=vmin, vmax=vmax, cmap=cmap)
 
 # Plot elements for each walker
@@ -57,7 +58,7 @@ for x, y in processed_paths:
     # Small white dot with black edge
     dot, = ax.plot([], [], marker='o', markerfacecolor='white', markeredgecolor='black', markersize=4, linestyle='None')
     cross, = ax.plot([], [], 'kx')  # Black 'X' for end
-    start, = ax.plot(360-25, 44.5, 'ko')  # Static black dot at origin
+    start, = ax.plot(offset-25, 44.5, 'ko')  # Static black dot at origin
     dots.append(dot)
     crosses.append(cross)
     starts.append(start)
@@ -95,7 +96,7 @@ def update(frame):
     ax.set_title(f"Day {frame} | Grid step {dx}x{dy}")
     ax.set_xlabel('x')
     ax.set_ylabel('y')
-    ax.plot(360-25, 44.5, 'ro')  # Fixed red marker
+    ax.plot(offset-25, 44.5, 'ro')  # Fixed red marker
 
     progressBar(frame, max_steps - 1, start_time)
     return artists
