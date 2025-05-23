@@ -17,8 +17,8 @@ import pickle
 
 ### === Options ===
 
-year = 2016
-days = 101
+year = 2020
+days = 100
 fps = 10
 vmin, vmax = 0, 0.5
 output_filename = f'{year}_{days}d.mp4'

@@ -20,15 +20,14 @@ import pickle
 N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
 N_released_per_day = 2   #Gamma=5 in Painter, amount of released tutels
 
-
 # Turtle related stuff
-startpos = np.array([-25, 44.5]) #lon(x), lat(y)
+startpos = np.array([335, 44.5]) #lon(x), lat(y)
 initial_probability = (0.174468, 0.28168, 0.09942134, 0.4444274) #lrud
 horizontalStepSize = 0.02 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
-startTime_1 = 140_256 #01-01-2016
+startTime_1 = 175_344 #01-01-2016
 timeResolution = 24 # This is regardless of the multiples of 3 hours 
                     # the dataset works with. 
 endTime = startTime_1 + timeResolution*N_simulation_days
@@ -44,9 +43,9 @@ y_range = (42, 47)
 ### END of options
 
 start = time.time()
-year=2016
-url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
-dataset1 = netCDF4.Dataset(url)
+year=2020
+url1 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2020' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+dataset1 = netCDF4.Dataset(url1)
 e=1e-3
 
 time_array_1 = dataset1.variables['time'][:]

@@ -117,7 +117,7 @@ for i in range(simLengthDays):
     save_data([matrix, vf_x, vf_y], 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', i)
     
     for j in range(N_steps_per_day):
-        grid.timeStep(diffusion=True, constantAdvection=True, VFAdvection=False)
+        grid.timeStep(diffusion=True, constantAdvection=True, VFAdvection=True)
         progressBar(i*N_steps_per_day + j, simLengthDays*N_steps_per_day-1, start_time, comment=grid.getTotalValue(), commentMessage='Mass')
     
     

@@ -115,6 +115,7 @@ class Grid:
     def getVectorField(self, dataset, lons_idx, lats_idx, timeIndex):
         u_data = dataset.variables['water_u'][timeIndex, 0, lats_idx, lons_idx]
         v_data = dataset.variables['water_v'][timeIndex, 0, lats_idx, lons_idx]
+
         
         self.vectorfield_x = np.zeros((self.y_num, self.x_num))
         self.vectorfield_y = np.zeros((self.y_num, self.x_num))
@@ -124,7 +125,6 @@ class Grid:
                 pos_x, pos_y = self.itc(j, i)
                 idx_data_lon = np.clip(np.searchsorted(self.lon_vals, pos_x), 0, len(self.lon_vals)-1)
                 idx_data_lat = np.clip(np.searchsorted(self.lat_vals, pos_y), 0, len(self.lat_vals)-1)
-                
                 x_val = u_data[idx_data_lat, idx_data_lon]
                 y_val = v_data[idx_data_lat, idx_data_lon]
                 

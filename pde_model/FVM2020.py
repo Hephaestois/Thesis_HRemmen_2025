@@ -37,19 +37,19 @@ dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
 dt = 0.01 # timestep between dataset swapping. scale: day.
 # For 2024: Only 246 days are present!
 simLengthDays = 100
-year = 2024 #For naming dataset, should only be changed between files.
+year = 2020 #For naming dataset, should only be changed between files.
 
 
 # TODO: Change these to 2024
 ### Related to dataset time and VF
-startTime_1 = 210_408      # This repr. 01-01-2024, Hours since 01-01-2000.
+startTime_1 = 175_344      # This repr. 01-01-2024, Hours since 01-01-2000.
 startTime_2 = 300_000      # a high enough number!
 timeResolution = 24     # Hours between dataset snapshots. Intermediate timesteps use identical set.
 endTime = startTime_1 + timeResolution * simLengthDays
 quiver_step = int(np.floor(0.4/dx))
 
 ### Dataset url
-url1 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2024' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+url1 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2020' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
 ### Start simulation related stuff
 
 grid = Grid(x_range, y_range, dx ,dy)
