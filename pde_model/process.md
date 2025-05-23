@@ -134,7 +134,34 @@ and make it so that all the python files are run from main instead of their subd
 # 22 may
 
 Let it be known: Today (2PM) is the presentation and I haven't started yet as of 8:45AM. I need to create slides, finish my text and learn my text. 
+(Written 23 may): The presentation went awesome-ly!! Havva seems positive; if I can extend this idea into a 30 minute sesion, I am very positive about the result!
 
+# 23 may
+
+Yesterday after having done the presentation I was completely fried, but I am glad it went so well. I had still corresponded with Havva and Viktoria about where to take the project from here, and what to do working towards the final presentation. I'm in a positive mood but still feeling a little worn out from doing so much yesterday.
+
+Anyway! Today I want to get the simulations working in specifically 2016 and 2024. I will first allow myself to consider whether I could write a general function that returns the dataset from a year at a specific time, in hopes of saving double work. If I fail, I am going to implement the years in the following order, as per Viktorias advice:
+(Already did 2016 in PDE, just need to extend RW to 300 days)
+year, order
+2016 1st
+2017            4th
+2018        3rd
+2019            4th
+2020    2nd
+2021            4th
+2022        3rd
+2023            4th
+2024 1st
+
+This means that if there is indeed a trend in this data, I should be able to spot it before increasing resolution. If by the 3rd iteration I don't see a trend, I will be very sad.
+
+Additional tasks that might need tending to:
+- Change swimming distance? Possibly implies recalibrating the PJP simulation
+- Fix the boundary conditions in the advection operator for once
+- Make sure counting the PDE population actually works: currently it does not and I know why, but won't write it here
+- Change up save_data a little: I realize I don't want the resolution to be included (only in the metadata, not in the filename), as I am just going to roll with a resolution like 0.08x0.08, ensure stability and then just _keep that constant_. Changing it between simulations will just cause pain in the ass. This might also make it possible to write a bash script automating the creating of the datasets and plots, as the format then suddenly becomes simpler. Might mean I can run the models overnight and save a lot of processing time with that! If resolution is changed, I will indicate that in the label, for example by adding '_HD' to the file extension. I suppose I can just choose two resolutions I will run the models at, and leave it at that.
+
+I started by creating FVM2024.py, and immediately got a big good result: the distribution of the dates in the dataset is very convenient! Most of the 'cut up' datasets are in 2017, and the ENTIRE range december-04-2018 to september-04-2024 is ONE dataset.
 
 # List of attendees/invites for the final presentation: (who still need to know a location)
 
