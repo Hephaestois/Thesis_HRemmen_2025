@@ -8,7 +8,7 @@
 # For 2016, 2017: Offset=0
 # For >2017: offset = 360
 
-ndays=100
+ndays=500
 dx=0.1
 dy=0.1
 dt=0.01

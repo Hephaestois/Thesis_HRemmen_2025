@@ -47,14 +47,15 @@ year = 2020 #For naming dataset, should only be changed between files.
 
 # TODO: Change these to 2024
 ### Related to dataset time and VF
-startTime_1 = 175_344      # This repr. 01-01-2024, Hours since 01-01-2000.
-startTime_2 = 300_000      # a high enough number!
+startTime_1 = 175_344      # This repr. 01-01-2020, Hours since 01-01-2000.
+startTime_2 = 184_128      # 01-01-2021 
 timeResolution = 24     # Hours between dataset snapshots. Intermediate timesteps use identical set.
 endTime = startTime_1 + timeResolution * simLengthDays
 quiver_step = int(np.floor(0.4/dx))
 
 ### Dataset url
 url1 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2020' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+url2 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2021'
 ### Start simulation related stuff
 
 grid = Grid(x_range, y_range, dx ,dy)
@@ -76,20 +77,28 @@ grid.ic(initialCondition, 400)
 #
 
 dataset1 = netCDF4.Dataset(url1)
+dataset2 = netCDF4.Dataset(url2)
 e = 1e-3 #Small offset for mask boundaries
 
 # Original arrays
 time_array_1 = dataset1.variables['time'][:]
+time_array_2 = dataset2.variables['time'][:]
+
 
 lon_array = dataset1.variables['lon'][:]
 lat_array = dataset1.variables['lat'][:]
-
 
 # Time indices and values for timeset 1
 time_mask_1 = (time_array_1 >= startTime_1) & (time_array_1 <= endTime)
 time_idx_1 = np.where(time_mask_1)[0]
 times_1 = time_array_1[time_idx_1]
 startTimeIndex_1 = list(time_array_1).index(startTime_1)
+
+# Time indices for timeset 2
+time_mask_2 = (time_array_2 >= startTime_2) & (time_array_2 <= endTime)
+time_idx_2 = np.where(time_mask_2)[0]
+times_2 = time_array_2[time_idx_2]
+startTimeIndex_2 = list(time_array_2).index(startTime_2)
 
 # Longitude indices and values
 lon_mask = (lon_array >= min(x_range)-e) & (lon_array <= max(x_range)+e)
@@ -120,9 +129,13 @@ for i in range(simLengthDays):
         grid.addValue(grid.cti(335, 44.5), 2)
     
     simTime = startTime_1 + i*timeResolution #Hours since 2000
-    simTimeIndex = np.searchsorted(times_1, simTime) + startTimeIndex_1 #To access dataset
-    dataset = dataset1
-
+    if simTime < startTime_2:
+        simTimeIndex = np.searchsorted(times_1, simTime) + startTimeIndex_1
+        dataset = dataset1
+    else:
+        simTimeIndex = np.searchsorted(times_2, simTime) + startTimeIndex_2
+        dataset = dataset2
+    
     #To plot a quiver later
     vf_x, vf_y = grid.getVectorField(dataset, lon_idx, lat_idx, simTimeIndex) #At the start of every 24 hours.
     

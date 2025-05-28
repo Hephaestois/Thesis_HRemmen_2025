@@ -36,8 +36,9 @@ horizontalStepSize = 0.02 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
-startTime_1 = 140_256 #01-01-2016
-startTime_2 = 143_184
+startTime_1 = 140_256     # This repr. 01-01-2016, Hours since 01-01-2000. End at 30-04-2016
+startTime_2 = 143_184     # This repr. 01-05-2016 (May)
+startTime_3 = 149_808      # This repr. 01-02-2017 (Feb)
 timeResolution = 24 # This is regardless of the multiples of 3 hours 
                     # the dataset works with. 
 endTime = startTime_1 + timeResolution*N_simulation_days
@@ -56,17 +57,23 @@ start = time.time()
 year=2016
 url1 = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
 url2 = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_57.2'
+url3 = 'https://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_92.8'
+
 dataset1 = netCDF4.Dataset(url1)
 dataset2 = netCDF4.Dataset(url2)
-e=1e-3
+dataset3 = netCDF4.Dataset(url3)
+e = 1e-3 #Small offset for mask boundaries
 
+# Original arrays
 time_array_1 = dataset1.variables['time'][:]
 time_array_2 = dataset2.variables['time'][:]
+time_array_3 = dataset3.variables['time'][:]
+
 
 lon_array = dataset1.variables['lon'][:]
 lat_array = dataset1.variables['lat'][:]
 
-# Time indices for timeset 1
+# Time indices and values for timeset 1
 time_mask_1 = (time_array_1 >= startTime_1) & (time_array_1 <= endTime)
 time_idx_1 = np.where(time_mask_1)[0]
 times_1 = time_array_1[time_idx_1]
@@ -78,6 +85,11 @@ time_idx_2 = np.where(time_mask_2)[0]
 times_2 = time_array_2[time_idx_2]
 startTimeIndex_2 = list(time_array_2).index(startTime_2)
 
+# Time indices for timeset 3
+time_mask_3 = (time_array_3 >= startTime_3) & (time_array_3 <= endTime)
+time_idx_3 = np.where(time_mask_3)[0]
+times_3 = time_array_3[time_idx_3]
+startTimeIndex_3 = list(time_array_3).index(startTime_3)
 
 # Longitude indices and values
 lon_mask = (lon_array >= min(x_range)-e) & (lon_array <= max(x_range)+e)
@@ -108,30 +120,32 @@ paths.append([])
 start_frames.append(0)  # Frame when this turtle starts walking
   
 for i in range(N_simulation_days+1):
-    for _ in range(N_released_per_day):
-        tutel = Walker(
-            init_position=startpos,
-            init_probs=initial_probability,
-            horizontalStepSize=horizontalStepSize, 
-            verticalStepSize=verticalStepSize,
-            lon_vals = dataset1.variables['lon'][lon_idx],
-            lat_vals = dataset1.variables['lat'][lat_idx]   
-        )
-        Tutels.append(tutel)
-        paths.append([])
-        start_frames.append(i)  # Frame when this turtle starts walking
+    if i < 300:
+        for _ in range(N_released_per_day):
+            tutel = Walker(
+                init_position=startpos,
+                init_probs=initial_probability,
+                horizontalStepSize=horizontalStepSize, 
+                verticalStepSize=verticalStepSize,
+                lon_vals = dataset1.variables['lon'][lon_idx],
+                lat_vals = dataset1.variables['lat'][lat_idx]   
+            )
+            Tutels.append(tutel)
+            paths.append([])
+            start_frames.append(i)  # Frame when this turtle starts walking
 
     progressBar(i, N_simulation_days, start)    
 
-    simTime = startTime_1 + i*timeResolution
+    simTime = startTime_1 + i*timeResolution #Hours since 2000
     if simTime < startTime_2:
-        # Searchsorted finds the place t would be put to maintain order. 
-        # So this is the closest value to t that is no larger than t.    
-        simulationTimeIndex = np.searchsorted(times_1, simTime) + startTimeIndex_1 #To access dataset
+        simulationTimeIndex = np.searchsorted(times_1, simTime) + startTimeIndex_1
         dataset = dataset1
-    else:
-        simulationTimeIndex = np.searchsorted(times_2, simTime) + startTimeIndex_2 #To access dataset
+    elif simTime < startTime_3:
+        simulationTimeIndex = np.searchsorted(times_2, simTime) + startTimeIndex_2
         dataset = dataset2
+    else:
+        simulationTimeIndex = np.searchsorted(times_3, simTime) + startTimeIndex_3
+        dataset=dataset3
     
     vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lat_idx, lon_idx]
     vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lat_idx, lon_idx]
