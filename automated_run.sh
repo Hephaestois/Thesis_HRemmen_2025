@@ -39,6 +39,14 @@ python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
 
+### 2022
+year=2022
+
+python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
+
+
 ### 2024
 # year=2024
 
