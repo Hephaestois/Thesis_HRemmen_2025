@@ -17,7 +17,7 @@ import pickle
 
 ### === Options ===
 
-year = 2020
+year = 2016
 days = 100
 fps = 10
 vmin, vmax = 0, 0.5

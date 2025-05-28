@@ -23,7 +23,7 @@ from matplotlib.colors import Normalize
 #
 
 ### Related to constants
-diffusionMatrix = [[0.00456, 0], [0, 0.00544]] #Converted to NParray later. Diffusion behaviour
+diffusionMatrix = [[0.00009, 0], [0, 0.00011]] #Converted to NParray later. Diffusion behaviour
 advectionVector = [0.108, -0.345] #Converted to NP later. Only defines direction, length is set using advectionWeight (analog to swimspeed!!!)
 km_travel_per_day = 2 # Daily swimming distance
 advectionWeight = km_travel_per_day/100 
@@ -35,7 +35,7 @@ y_range = [42, 47]
 dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
 dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
 dt = 0.01 # timestep between dataset swapping. scale: day.
-simLengthDays = 300
+simLengthDays = 100
 year = 2016 #For naming dataset, should only be changed between files.
 
 
@@ -53,7 +53,7 @@ url2 = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_57.2'
 
 grid = Grid(x_range, y_range, dx ,dy)
 grid.setDiffusionConstants(np.array(diffusionMatrix))
-grid.setAdvectionConstant(advectionWeight*(np.array(advectionVector)/np.sqrt(np.sum(np.array(advectionVector)**2))))
+grid.setAdvectionConstant(advectionWeight*(np.array(advectionVector)))#/np.sqrt(np.sum(np.array(advectionVector)**2))))
 grid.setTimestep(dt)
 
 grid.precalculateDiffusiveOperator(type="Neumann", direction="Horizontal")

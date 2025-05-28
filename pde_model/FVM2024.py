@@ -22,7 +22,7 @@ from matplotlib.colors import Normalize
 #
 
 ### Related to constants
-diffusionMatrix = [[0.00456, 0], [0, 0.00544]] #Converted to NParray later. Diffusion behaviour
+diffusionMatrix = [[0.00009, 0], [0, 0.00011]] #Converted to NParray later. Diffusion behaviour
 advectionVector = [0.108, -0.345] #Converted to NP later. Only defines direction, length is set using advectionWeight (analog to swimspeed!!!)
 km_travel_per_day = 2 # Daily swimming distance
 advectionWeight = km_travel_per_day/100 

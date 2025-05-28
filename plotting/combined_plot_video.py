@@ -16,7 +16,7 @@ import time
 
 # === Configuration ===
 year = 2016
-days = 300
+days = 100
 fps = 10
 vmin, vmax = 0, 0.5
 matrix_cutoff = 0.02
@@ -24,13 +24,15 @@ density_resolution = '0.1x0.1_0.01'
 walk_nperday = 2
 output_filename = f'{year}_{days}d_combined.mp4'
 offset = 0 #360 for degrees East, 0 for West
-
+             # 2016: 360, other: 0
+             
+             
 # === Load metadata and data ===
 metadata = load_data("pde", year, days, density_resolution, 'metadata')
 dx, dy = metadata['dx'], float(metadata['dy'])
 
 # Load random walk data
-paths, start_frames = load_data('discrete', str(year), str(days), f'{walk_nperday}perday', 'allpositions')
+paths, start_frames = load_data('discrete', year, days, f'{walk_nperday}perday', 'allpositions')
 processed_paths = [zipCoords(path) for path in paths]
 path_lengths = [len(p[0]) for p in processed_paths]
 max_steps = max(start + len(p[0]) for p, start in zip(processed_paths, start_frames))
@@ -98,12 +100,12 @@ def update(frame):
     ax.set_ylabel('y')
     ax.plot(offset-25, 44.5, 'ro')  # Fixed red marker
 
-    progressBar(frame, max_steps - 1, start_time)
+    progressBar(frame, max_steps, start_time)
     return artists
 
 # === Run animation ===
 print("Starting combined animation...")
-ani = animation.FuncAnimation(fig, update, frames=max_steps, interval=1000 / fps, blit=True)
+ani = animation.FuncAnimation(fig, update, frames=max_steps+1, interval=1000 / fps, blit=True)
 writer = FFMpegWriter(fps=fps)
 ani.save(output_filename, writer=writer)
 plt.close()
