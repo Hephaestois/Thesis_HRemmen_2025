@@ -24,20 +24,20 @@ python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
 
 
-# ### 2018
-# offset=360
-# year=2018
+### 2018
+offset=360
+year=2018
 
-# python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
-# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-# python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
+python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
 
-# ### 2020
-# year=2020
+### 2020
+year=2020
 
-# python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
-# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-# python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
+python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
 
 ### 2024
 # year=2024
