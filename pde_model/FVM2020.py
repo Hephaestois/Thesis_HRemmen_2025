@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
 
 # Handle arguments
-if len(sys.argv) != 6:
+if len(sys.argv) != 5:
     print("Usage: python FVM[year].py <sim_days> <dx> <dy> <dt>")
     sys.exit(1)
 

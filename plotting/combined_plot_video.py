@@ -5,6 +5,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'l
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
 
+# Handle arguments
+if len(sys.argv) != 6:
+    print("Usage: python FVM[year].py <sim_days> <dx> <dy> <dt>")
+    sys.exit(1)
+
+year = int(sys.argv[1])
+simLengthDays = int(sys.argv[2])
+dx = float(sys.argv[3])
+dy = float(sys.argv[4])
+dt = float(sys.argv[5])
+
 # Other imports
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,12 +26,11 @@ from library.functions import load_data, progressBar, zipCoords
 import time
 
 # === Configuration ===
-year = 2016
-days = 100
+days = simLengthDays
 fps = 10
 vmin, vmax = 0, 0.5
 matrix_cutoff = 0.02
-density_resolution = '0.1x0.1_0.01'
+density_resolution = f'{dx}x{dy}_{dt}'
 walk_nperday = 2
 output_filename = f'{year}_{days}d_{density_resolution}_combined.mp4'
 offset = 0 #360 for degrees East, 0 for West
