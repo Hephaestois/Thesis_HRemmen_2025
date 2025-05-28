@@ -38,6 +38,8 @@ output_filename = f'{year}_{days}d_{density_resolution}_combined.mp4'
 # === Load metadata and data ===
 metadata = load_data("pde", year, days, density_resolution, 'metadata')
 exceedsTop, exceedsBottom = load_data('discrete', f'{year}', f'{days}', f'{walk_nperday}perday', 'exceedTopBottom')
+print(f'{year} Survival Ratio: ', exceedsBottom / (exceedsTop+exceedsBottom))
+
 
 dx, dy = float(metadata['dx']), float(metadata['dy'])
 

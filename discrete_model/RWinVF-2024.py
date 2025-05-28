@@ -98,20 +98,21 @@ paths.append([])
 start_frames.append(0)  # Frame when this turtle starts walking
   
 for i in range(N_simulation_days):
-    for _ in range(N_released_per_day):
-        tutel = Walker(
-            init_position=startpos,
-            init_probs=initial_probability,
-            horizontalStepSize=horizontalStepSize, 
-            verticalStepSize=verticalStepSize,
-            lon_vals = dataset1.variables['lon'][lon_idx],
-            lat_vals = dataset1.variables['lat'][lat_idx]   
-        )
-        Tutels.append(tutel)
-        paths.append([])
-        start_frames.append(i)  # Frame when this turtle starts walking
+    if i < 300:
+        for _ in range(N_released_per_day):
+            tutel = Walker(
+                init_position=startpos,
+                init_probs=initial_probability,
+                horizontalStepSize=horizontalStepSize, 
+                verticalStepSize=verticalStepSize,
+                lon_vals = dataset1.variables['lon'][lon_idx],
+                lat_vals = dataset1.variables['lat'][lat_idx]   
+            )
+            Tutels.append(tutel)
+            paths.append([])
+            start_frames.append(i)  # Frame when this turtle starts walking
 
-    progressBar(i, N_simulation_days, start)    
+        progressBar(i, N_simulation_days, start)    
 
     # Searchsorted finds the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
