@@ -5,6 +5,16 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'l
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
 
+# Handle arguments
+if len(sys.argv) != 6:
+    print("Usage: python FVM[year].py <sim_days> <dx> <dy> <dt>")
+    sys.exit(1)
+
+simLengthDays = int(sys.argv[1])
+dx = float(sys.argv[2])
+dy = float(sys.argv[3])
+dt = float(sys.argv[4])
+
 # Other imports
 from library.structures import Grid
 from library.functions import progressBar, save_data
@@ -32,10 +42,6 @@ initialCondition = 'inflow' #'delta' or 'gauss'. See grid.ic for details, or man
 ### Related to integration domain
 x_range = [-29, -11]
 y_range = [42, 47]
-dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
-dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
-dt = 0.01 # timestep between dataset swapping. scale: day.
-simLengthDays = 100
 year = 2016 #For naming dataset, should only be changed between files.
 
 
@@ -118,7 +124,7 @@ save_data(metadata, 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 'metadata')
 start_time = time()
 for i in range(simLengthDays):
     if initialCondition == 'inflow':
-        grid.addValue(grid.cti(-25, 44.5), 5)
+        grid.addValue(grid.cti(-25, 44.5), 2)
     
     simTime = startTime_1 + i*timeResolution #Hours since 2000
     if simTime < startTime_2:

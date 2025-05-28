@@ -5,6 +5,16 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'l
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
 
+# Handle arguments
+if len(sys.argv) != 6:
+    print("Usage: python FVM[year].py <sim_days> <dx> <dy> <dt>")
+    sys.exit(1)
+
+simLengthDays = int(sys.argv[1])
+dx = float(sys.argv[2])
+dy = float(sys.argv[3])
+dt = float(sys.argv[4])
+
 # Other imports
 from library.structures import Grid
 from library.functions import progressBar, save_data
@@ -22,7 +32,7 @@ from matplotlib.colors import Normalize
 #
 
 ### Related to constants
-diffusionMatrix = [[0.00456, 0], [0, 0.00544]] #Converted to NParray later. Diffusion behaviour
+diffusionMatrix = [[0.00009, 0], [0, 0.00011]] #Converted to NParray later. Diffusion behaviour
 advectionVector = [0.108, -0.345] #Converted to NP later. Only defines direction, length is set using advectionWeight (analog to swimspeed!!!)
 km_travel_per_day = 2 # Daily swimming distance
 advectionWeight = km_travel_per_day/100 
@@ -32,11 +42,6 @@ initialCondition = 'inflow' #'delta' or 'gauss'. See grid.ic for details, or man
 # 2018-2024: lons are in *East
 x_range = [331, 349]
 y_range = [42, 47]
-dx = 0.1 # dx =/= dy is supported. Some stepsizes will cause an idx-oo-bounds. add small perturbation to stepsize or choose differently. 
-dy = 0.1 # Ex: 0.01 breaks, 0.012 doesn't.
-dt = 0.01 # timestep between dataset swapping. scale: day.
-# For 2024: Only 246 days are present!
-simLengthDays = 100
 year = 2020 #For naming dataset, should only be changed between files.
 
 
@@ -112,7 +117,7 @@ save_data(metadata, 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 'metadata')
 start_time = time()
 for i in range(simLengthDays):
     if initialCondition == 'inflow':
-        grid.addValue(grid.cti(335, 44.5), 5)
+        grid.addValue(grid.cti(335, 44.5), 2)
     
     simTime = startTime_1 + i*timeResolution #Hours since 2000
     simTimeIndex = np.searchsorted(times_1, simTime) + startTimeIndex_1 #To access dataset

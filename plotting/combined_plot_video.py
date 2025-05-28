@@ -22,7 +22,7 @@ vmin, vmax = 0, 0.5
 matrix_cutoff = 0.02
 density_resolution = '0.1x0.1_0.01'
 walk_nperday = 2
-output_filename = f'{year}_{days}d_combined.mp4'
+output_filename = f'{year}_{days}d_{density_resolution}_combined.mp4'
 offset = 0 #360 for degrees East, 0 for West
              # 2016: 360, other: 0
              
