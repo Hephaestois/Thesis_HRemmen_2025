@@ -1,13 +1,40 @@
 #!/bin/bash
 
+# PDE and Discrete contain year in their filename!
+# PDE:      <ndays> <dx> <dy> <dt>
+# Discrete: <ndays> <nperday>
+# Plotter:  <year> <ndays> <dx> <dy> <dt> <nperday> <offset> 
+
+# For 2016, 2017: Offset=0
+# For >2017: offset = 360
+
 ndays=100
 dx=0.1
 dy=0.1
 dt=0.01
+nperday=2
+offset=360
 
-python pde_model/FVM2016.py $ndays $dx $dy $dt
-python plotting/combined_plot_video.py 2016 $ndays $dx $dy $dt
+### 2018
+year=2018
 
+python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
+
+### 2020
+year=2020
+
+python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
+
+### 2024
+year=2024
+
+python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
 
 
 

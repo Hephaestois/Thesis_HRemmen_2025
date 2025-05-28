@@ -4,6 +4,14 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'library')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
 
+# Handle arguments
+if len(sys.argv) != 3:
+    print("Usage: python RWinVF-[year].py <sim_days> <n_per_day>")
+    sys.exit(1)
+
+N_simulation_days = int(sys.argv[1])
+N_released_per_day = int(sys.argv[2])
+
 # Other imports
 from library.agents import Walker
 from library.functions import zipCoords, progressBar, save_data
@@ -17,8 +25,8 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
-N_released_per_day = 2   #Gamma=5 in Painter, amount of released tutels
+# N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
+# N_released_per_day = 2   #Gamma=5 in Painter, amount of released tutels
 
 # Turtle related stuff
 startpos = np.array([335, 44.5]) #lon(x), lat(y)
@@ -27,7 +35,7 @@ horizontalStepSize = 0.02 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
-startTime_1 = 175_344 #01-01-2016
+startTime_1 = 175_344 #01-01-2020
 timeResolution = 24 # This is regardless of the multiples of 3 hours 
                     # the dataset works with. 
 endTime = startTime_1 + timeResolution*N_simulation_days
@@ -102,7 +110,7 @@ for i in range(N_simulation_days):
         paths.append([])
         start_frames.append(i)  # Frame when this turtle starts walking
 
-    progressBar(i, N_simulation_days-1, start)    
+    progressBar(i, N_simulation_days, start)    
 
     # Searchsorted finds the place t would be put to maintain order. 
     # So this is the closest value to t that is no larger than t.
@@ -128,14 +136,19 @@ for i in range(N_simulation_days):
         # But per simulation step, this works out fine.
         paths[j].append(tutel.position)
         
-print(paths)
 
 print('Writing data to storage...')
-# Save the data so we can do graphical stuff on it.
-with open('createdData.pkl', 'wb') as file:
-    pickle.dump((paths, start_frames), file)
+
+exceedsTop = 0
+exceedsBottom = 0 
+
+for tutel in Tutels:
+    exceedsTop += tutel.exceedsTop
+    exceedsBottom += tutel.exceedsBottom
 
 save_data([paths, start_frames], "discrete", year, N_simulation_days, f'{N_released_per_day}perday', 'allpositions')
+save_data([exceedsTop, exceedsBottom], "discrete", year, N_simulation_days, f'{N_released_per_day}perday', 'exceedTopBottom')
+
 
 print("Done!")
 

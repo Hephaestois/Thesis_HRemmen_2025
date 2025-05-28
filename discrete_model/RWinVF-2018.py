@@ -12,7 +12,6 @@ if len(sys.argv) != 3:
 N_simulation_days = int(sys.argv[1])
 N_released_per_day = int(sys.argv[2])
 
-
 # Other imports
 from library.agents import Walker
 from library.functions import zipCoords, progressBar, save_data
@@ -26,8 +25,9 @@ import pickle
 ### Simulation options
 # High level stuff
 # N_tutels = 40
-# N_simulation_days = 100 # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
+# N_simulation_days = simLengthDays # N days of swimming. Dont go beyond 638 fr fr, exceeds dataset bound. 
 # N_released_per_day = 2   #Gamma=5 in Painter, amount of released tutels
+
 
 # Turtle related stuff
 startpos = np.array([335, 44.5]) #lon(x), lat(y)
@@ -36,24 +36,23 @@ horizontalStepSize = 0.02 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
 # Time / dataset related stuff
-startTime_1 = 210_408 #01-01-2016
+startTime_1 = 157_824  #01-01-2018
 timeResolution = 24 # This is regardless of the multiples of 3 hours 
                     # the dataset works with. 
 endTime = startTime_1 + timeResolution*N_simulation_days
-
 
 # Spatial dataset related stuff. #lat and #long should be the same length, delta is used to accomodate for this.
 longitude_data_stepsize = 1 #Multiples of 0.04 degree
 latitude_data_stepsize  = 1 #Multiples of 0.08 degree
 delta = 0                   #For correcting size mismatch in latitudes/longitudes.
-x_range = (331, 349)
+x_range = (331,349)
 y_range = (42, 47)
 
 ### END of options
 
 start = time.time()
-year=2024
-url1 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2024' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+year=2018
+url1 = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_93.0' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
 dataset1 = netCDF4.Dataset(url1)
 e=1e-3
 
@@ -62,6 +61,7 @@ time_array_1 = dataset1.variables['time'][:]
 lon_array = dataset1.variables['lon'][:]
 lat_array = dataset1.variables['lat'][:]
 
+# Time indices for timeset 1
 time_mask_1 = (time_array_1 >= startTime_1) & (time_array_1 <= endTime)
 time_idx_1 = np.where(time_mask_1)[0]
 times_1 = time_array_1[time_idx_1]
@@ -77,7 +77,6 @@ lat_mask = (lat_array >= min(y_range)-e) & (lat_array <= max(y_range)+e)
 lat_idx = np.where(lat_mask)[0]
 latitudes = lat_array[lat_idx]
 
-print(np.sum(lat_mask))
 
 vectorfield = dict()
 vectorfield['latitude'] = latitudes
@@ -97,7 +96,7 @@ Tutels.append(tutel)
 paths.append([])
 start_frames.append(0)  # Frame when this turtle starts walking
   
-for i in range(N_simulation_days):
+for i in range(N_simulation_days+1):
     for _ in range(N_released_per_day):
         tutel = Walker(
             init_position=startpos,
@@ -113,13 +112,12 @@ for i in range(N_simulation_days):
 
     progressBar(i, N_simulation_days, start)    
 
-    # Searchsorted finds the place t would be put to maintain order. 
-    # So this is the closest value to t that is no larger than t.
-    simulationTimeIndex = np.searchsorted(times_1, startTime_1+i*timeResolution)+startTimeIndex_1
-    ### NON-linterp
-
-    vectorfield['water_u']=dataset1.variables['water_u'][simulationTimeIndex, 0, lat_idx, lon_idx]
-    vectorfield['water_v']=dataset1.variables['water_v'][simulationTimeIndex, 0, lat_idx, lon_idx]
+    simTime = startTime_1 + i*timeResolution
+    simulationTimeIndex = np.searchsorted(times_1, simTime) + startTimeIndex_1 #To access dataset
+    dataset = dataset1
+    
+    vectorfield['water_u']=dataset.variables['water_u'][simulationTimeIndex, 0, lat_idx, lon_idx]
+    vectorfield['water_v']=dataset.variables['water_v'][simulationTimeIndex, 0, lat_idx, lon_idx]
     
     for j, tutel in enumerate(Tutels):
         if tutel.finished:
@@ -149,9 +147,6 @@ for tutel in Tutels:
 
 save_data([paths, start_frames], "discrete", year, N_simulation_days, f'{N_released_per_day}perday', 'allpositions')
 save_data([exceedsTop, exceedsBottom], "discrete", year, N_simulation_days, f'{N_released_per_day}perday', 'exceedTopBottom')
-
-
-save_data([paths, start_frames], "discrete", year, N_simulation_days, f'{N_released_per_day}perday', 'allpositions')
 
 print("Done!")
 

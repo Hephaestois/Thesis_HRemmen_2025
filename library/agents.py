@@ -44,6 +44,9 @@ class Walker:
         self.finished = False
         self.probdistance = 0
         
+        self.exceedsTop = 0
+        self.exceedsBottom = 0
+        
         
     def moveRandom(self):
         '''This function is responsible for handling the end-decision of where a turtle moves. 
@@ -178,10 +181,12 @@ class Walker:
         if np.all(np.greater(lat, 46.5)):
             # Force latitude to this value.
             self.position[1]=46.5
+            self.exceedsTop = 1
             return
         
         if np.all(np.less(lat, 42.5)):
             self.position[1]=42.5
+            self.exceedsBottom =1
             return
         
         if np.all(np.greater(lon,vectorfield['longitude'])):
