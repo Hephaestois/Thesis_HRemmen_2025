@@ -53,8 +53,8 @@ y_range = (42, 47)
 
 start = time.time()
 year=2022
-url1 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2020' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
-url2 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2021'
+url1 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2022' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
+url2 = 'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0/uv3z/2023'
 dataset1 = netCDF4.Dataset(url1)
 dataset2 = netCDF4.Dataset(url2)
 e = 1e-3 #Small offset for mask boundaries
