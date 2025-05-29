@@ -9,29 +9,17 @@
 # For >2017: offset = 360
 
 ndays=500
-dx=0.1
-dy=0.1
-dt=0.01
+dx=0.04
+dy=0.04
+dt=0.025
 nperday=2
-offset=360
+offset=0
 
-### 2019
-year=2019
+### 2016
+year=2016
 python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
-
-### 2021
-year=2021
-python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
-
-### 2023
-year=2023
-python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-python plotting/combined_plot_video.py $year $ndays $dx $dy $dt $nperday $offset
+python plotting/combined_plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset
 
 
 
