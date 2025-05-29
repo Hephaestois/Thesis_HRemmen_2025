@@ -31,7 +31,7 @@ print(exceedsTop, exceedsBottom, exceedsBottom/(exceedsTop+exceedsBottom))
 
 # Prepare figure
 fig, ax = plt.subplots(figsize=[10, 4], dpi=150)
-ax.set_xlim(331, 349)
+ax.set_xlim(-29, -11)
 ax.set_ylim(42, 47)
 
 # Preprocess paths
