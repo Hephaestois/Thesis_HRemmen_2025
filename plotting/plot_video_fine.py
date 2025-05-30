@@ -16,7 +16,7 @@ import time
 
 # Handle arguments
 if len(sys.argv) != 9:
-    print("Usage: python combined_plot_video.py <year> <ndays> <dx> <dy> <dt> <nperday> <offset>")
+    print("Usage: python combined_plot_video.py <year> <ndays> <dx> <dy> <dt> <nperday> <offset> <mode>")
     sys.exit(1)
 
 year = int(sys.argv[1])
@@ -35,7 +35,7 @@ assert mode in {"rw", "pde", "both"}, "mode must be one of: density, walkers, bo
 
 fps = 10
 vmin, vmax = 0, 0.05
-matrix_cutoff = 0.0004
+matrix_cutoff = 0.001
 plot_paths = (mode == "rw")  # Only show red path lines in 'walkers' mode
 density_resolution = f'{dx}x{dy}_{dt}'
 output_filename = f'{year}_{days}d_{density_resolution}_combined.mp4'

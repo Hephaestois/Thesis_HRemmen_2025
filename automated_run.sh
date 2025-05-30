@@ -15,25 +15,27 @@ dt=0.01
 nperday=2
 offset=0
 
+dx=0.04
+dy=0.04
+dt=0.025
+
+
 ### 2016
 year=2016
 # python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-# python plotting/combined_plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset
+python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
 
-dx=0.04
-dy=0.04
-dt=0.025
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 both
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 both
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 both
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 rw
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 rw
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 rw
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 pde
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 pde
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 pde
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 both &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 both &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 both &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 rw &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 rw &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 rw &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 pde &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 pde &
+# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 pde &
 
 
 

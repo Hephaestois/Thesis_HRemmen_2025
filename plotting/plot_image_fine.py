@@ -32,7 +32,7 @@ walk_opacity = 10/frame  # Opacity of path lines
 
 # === Setup ===
 density_resolution = f'{dx}x{dy}_{dt}'
-matrix_cutoff = 0.0004
+matrix_cutoff = 0.001
 vmin, vmax = 0, 0.05
 
 # === Load data ===
