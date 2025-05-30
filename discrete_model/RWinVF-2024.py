@@ -98,7 +98,7 @@ paths.append([])
 start_frames.append(0)  # Frame when this turtle starts walking
   
 for i in range(N_simulation_days):
-    if i < 300:
+    if i < 366:
         for _ in range(N_released_per_day):
             tutel = Walker(
                 init_position=startpos,
