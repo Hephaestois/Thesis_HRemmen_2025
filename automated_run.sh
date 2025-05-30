@@ -12,7 +12,7 @@ ndays=500
 dx=0.1
 dy=0.1
 dt=0.01
-nperday=20
+nperday=5
 offset=0
 
 dx=0.04
@@ -21,20 +21,20 @@ dt=0.025
 
 
 ### 2016
-year=2016
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-year=2018
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-year=2019
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-year=2020
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-year=2021
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+# year=2016
+# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+# year=2018
+# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+# year=2019
+# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+# year=2020
+# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+# year=2021
+# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 year=2022
 python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-year=2023
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+# year=2023
+# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 
 # python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
