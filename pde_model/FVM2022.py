@@ -125,7 +125,7 @@ save_data(metadata, 'pde', year, simLengthDays, f'{dx}x{dy}_{dt}', 'metadata')
 
 start_time = time()
 for i in range(simLengthDays):
-    if initialCondition == 'inflow' and i<300:
+    if initialCondition == 'inflow' and i<366:
         grid.addValue(grid.cti(335, 44.5), 2)
     
     simTime = startTime_1 + i*timeResolution #Hours since 2000
