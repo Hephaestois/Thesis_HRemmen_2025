@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ''
 
 # Other imports
 from library.agents import Walker
-from library.functions import zipCoords, getVectorFieldFromExcel, progressBar
+from library.functions import zipCoords, progressBar
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
@@ -16,22 +16,21 @@ import netCDF4
 
 ### Simulation options
 # High level stuff
-N_swims = 40
-swim_length = 600
+N_swims = 100
+swim_length = 300
 startpos = np.array([-25.6, 44.4])
-walk_opacity = 0.2
+walk_opacity = 0.01
 
 ### Options
-N_steps = 800
-longitude_data_stepsize = 16 #Multiples of 0.04 degree
-latitude_data_stepsize  = 8 #Multiples of 0.08 degree
-delta = 8
+longitude_data_stepsize = 1 #Multiples of 0.04 degree
+latitude_data_stepsize  = 1 #Multiples of 0.08 degree
+delta = 0
 simulationTimeIndex = 131496 #Moment at which this simulation is ran. This is time CONSTANT vector field.
 
 ### END options
 
 start = time.time()
-url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3'
+url = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3' # No spatial resolution for the dataset is necessary; it is interpolated onto the simulation grid size.
 dataset = netCDF4.Dataset(url)
 
 lons_idx = range(1885,2113,longitude_data_stepsize)
@@ -48,10 +47,15 @@ vectorfield['longitude'] = longitudes
 vectorfield['water_u'] = water_u
 vectorfield['water_v'] = water_v
 
+label_fontsize = 12
+tick_fontsize = 12
 
 #Math ends here, only plotting below.
-plt.figure(figsize=[10, 4], dpi=400)
-plt.quiver(longitudes, latitudes, water_u, water_v, angles='xy', scale_units='xy', scale=2)
+plt.figure(figsize=[10, 3.2], dpi=150)
+quiver_step=6
+plt.quiver(longitudes[::quiver_step], latitudes[::quiver_step], water_u[::quiver_step, ::quiver_step], water_v[::quiver_step, ::quiver_step], scale=40, color='k')
+
+#plt.quiver(longitudes, latitudes, water_u, water_v, angles='xy', scale_units='xy', scale=2)
 points = []
 
 
@@ -59,8 +63,10 @@ for i in range(N_swims):
     progressBar(i, N_swims-1, start)
     Tutel = Walker(
         init_position=startpos,
-        horizontalStepSize=0.05, 
-        verticalStepSize=0.05
+        init_probs=(0.25,0.25,0.25,0.25),
+        #init_probs=(0.174468, 0.28168, 0.09942134, 0.4444274),
+        horizontalStepSize=0.02, 
+        verticalStepSize=0.02
         )
     locations = []
     for _ in range(swim_length):
@@ -75,9 +81,13 @@ for i in range(N_swims):
     for j in range(len(plotvals[0])-1):
         plt.plot(plotvals[0][j:j+2], plotvals[1][j:j+2], color='red', alpha=walk_opacity)
     
-#plt.scatter(zipCoords(points)[1], zipCoords(points)[0], color='g', marker='.', zorder=10)        
+#plt.scatter(zipCoords(points)[0], zipCoords(points)[1], color='g', marker='.')       
+plt.tight_layout() 
 plt.plot(startpos[0], startpos[1], color="k", marker='.')
+plt.xlabel("Longitude ($\degree$E)", fontsize=label_fontsize)
+plt.ylabel("Latitude ($\degree$N)", fontsize=label_fontsize)
+plt.tick_params(labelsize=tick_fontsize)
 
 end = time.time()
 print(f"{1000 * (end - start)} milliseconds elapsed")
-plt.savefig('randomWalk.png')
+plt.savefig('randomWalk.png', bbox_inches='tight')
