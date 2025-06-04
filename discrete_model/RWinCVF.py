@@ -15,9 +15,9 @@ import numpy as np
 
 ### Options
 N_steps = 800
-longitude_data_stepsize = 16 #Multiples of 0.04 degree
-latitude_data_stepsize  = 8 #Multiples of 0.08 degree
-delta = 8
+longitude_data_stepsize = 1 #Multiples of 0.04 degree
+latitude_data_stepsize  = 1 #Multiples of 0.08 degree
+delta = 0
 simulationTimeIndex = 131496 #Moment at which this simulation is ran. This is time CONSTANT vector field.
 
 ### END options
@@ -40,7 +40,7 @@ vectorfield['longitude'] = longitudes
 vectorfield['water_u'] = water_u
 vectorfield['water_v'] = water_v
 
-Tutel = Walker(init_position=np.array([-25.6, 44.4]), horizontalStepSize=0.05, verticalStepSize=0.05)
+Tutel = Walker(init_position=np.array([-25.6, 44.4]), horizontalStepSize=0.02, verticalStepSize=0.02)
 
 locations=[]
 for _ in range(N_steps):
@@ -48,7 +48,8 @@ for _ in range(N_steps):
 
 plotvals = zipCoords(locations)
 plt.figure(dpi=600)
-plt.quiver(longitudes, latitudes, water_u, water_v, angles='xy', scale_units='xy', scale=2)
+quiver_step=1
+plt.quiver(longitudes[::quiver_step], latitudes[::quiver_step], water_u[::quiver_step, ::quiver_step], water_v[::quiver_step, ::quiver_step], scale=40, color='k')
 for i in range(len(plotvals[0])-1):
     plt.plot(plotvals[0][i:i+2], plotvals[1][i:i+2], color='red', alpha=0.5)
 #plt.plot(plotvals[0][0], plotvals[1][0], color="k", marker='.')

@@ -16,10 +16,12 @@ def chooseDirection(cumProbs):
     e = 1e-4
     
     for v in cumProbs:
-        if v>1 or v<0:
-            raise("Impossible probability was found!!!!!")
+        if v>1+e or v<0-e:
+            print(f'{cumProbs}')
+            raise(f"Impossible probability was found!!!!!")
+        
     if cumProbs[3] < 1-e or cumProbs[3] > 1+e:
-        raise(f"invalid sum of probs found!!!! {cumProbs[3]}")
+        raise(f"invalid sum of probs found!!!! {cumProbs[3]} = SUM{cumProbs}")
     
     if randomNumber <= cumProbs[0]:
         return np.array([-1, 0])
