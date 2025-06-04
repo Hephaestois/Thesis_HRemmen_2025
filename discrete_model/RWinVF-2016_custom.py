@@ -32,6 +32,7 @@ import pickle
 # Turtle related stuff
 startpos = np.array([-25, 44.5]) #lon(x), lat(y)
 initial_probability = (0.174468, 0.28168, 0.09942134, 0.4444274) #lrud
+initial_probability = (0, 0.238410, 0, 0.76158)
 horizontalStepSize = 0.02 # Turtle step size, in degrees lat/long
 verticalStepSize = 0.02   # Turtle step size, in degrees lat/long
 
@@ -176,8 +177,8 @@ for tutel in Tutels:
     exceedsTop += tutel.exceedsTop
     exceedsBottom += tutel.exceedsBottom
 
-save_data([paths, start_frames], "discrete_onlyConstant", year, N_simulation_days, f'{N_released_per_day}perday', 'allpositions')
-save_data([exceedsTop, exceedsBottom], "discrete_onlyConstant", year, N_simulation_days, f'{N_released_per_day}perday', 'exceedTopBottom')
+save_data([paths, start_frames], "discrete_onlyAdvection", year, N_simulation_days, f'{N_released_per_day}perday', 'allpositions')
+save_data([exceedsTop, exceedsBottom], "discrete_onlyAdvection", year, N_simulation_days, f'{N_released_per_day}perday', 'exceedTopBottom')
 
 print("Done!")
 

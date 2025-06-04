@@ -33,17 +33,17 @@ walk_opacity = 10/frame  # Opacity of path lines
 # === Setup ===
 density_resolution = f'{dx}x{dy}_{dt}'
 matrix_cutoff = 0.001
-vmin, vmax = 0, 0.05
+vmin, vmax = 0, 2
 
 # === Load data ===
-metadata = load_data("pde_onlyAdvection", year, days, density_resolution, 'metadata')
-paths, start_frames = load_data('discrete', year, days, f'{walk_nperday}perday', 'allpositions')
+metadata = load_data("pde_onlyConstant", year, days, density_resolution, 'metadata')
+paths, start_frames = load_data('discrete_onlyConstant', year, days, f'{walk_nperday}perday', 'allpositions')
 processed_paths = [zipCoords(path) for path in paths]
-filename = "figures/special/onlyAdvection.png"
+filename = "figures/special/pde_onlyConstant.png"
 
 
 # === Load matrix for the specific frame ===
-matrix = load_data("pde", year, days, density_resolution, frame)[0]
+matrix = load_data("pde_onlyConstant", year, days, density_resolution, frame)[0]
 y_min_display = 42.5
 y_max_display = 46.5
 label_fontsize = 12
@@ -80,6 +80,8 @@ if mode in {"pde", "both"}:
                             aspect=1, vmin=vmin, vmax=vmax, cmap=cmap)
     cbar = fig.colorbar(density_img, cax=cax)
     cbar.ax.tick_params(labelsize=tick_fontsize)
+    # ax.plot(offset - 25, 44.5, 'ro')
+
 
 # === Plot turtles if requested ===
 if mode in {"rw", "both"}:
@@ -100,7 +102,7 @@ if mode in {"rw", "both"}:
         ax.plot(offset - 25, 44.5, 'ko')  # origin
 
     # Fixed red marker
-    ax.plot(offset - 25, 44.5, 'ro')
+    ax.plot(offset - 25.25, 44.75, 'ro')
 
 # === Final touches ===
 ax.set_title(f"{year}, Day {frame}", fontsize=title_fontsize)
