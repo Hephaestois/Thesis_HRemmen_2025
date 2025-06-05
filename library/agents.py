@@ -52,22 +52,20 @@ class Walker:
         '''This function is responsible for handling the end-decision of where a turtle moves. 
         
         It relies on the local Flow Speed, and the local and global probabilities of movement.
-        I use Viktoria's proposal for the determination of the flow speed, so that we still
+        I use Viktoria's proposal for the linear combination flow speed, so that we still
         acquire valid probabilities (SUM=1), and are able to factor in the weight of the vector field.
-        
-        TODO: Study how the parameter localFlowSpeed should be chosen for 'correct' performance. Currently =1 does not sound any mental alarms.
         '''
-        # Correction factor for the localFlowSpeed, because of unit conversions. Currently unused (=1)
-        #flowSpeedMultiplier = 86.4/3
-        flowSpeedMultiplier = 86.4/3
-        walkerMultiplier = 3
+        flowSpeedMultiplier = 0.864
+        walkerMultiplier = 2/100
+        alpha = flowSpeedMultiplier/walkerMultiplier
         
-        normalization = walkerMultiplier + flowSpeedMultiplier*np.sum(self.localFlow)
+        #normalization = walkerMultiplier + flowSpeedMultiplier*np.sum(self.localFlow)
+        normalization = 1 + alpha*np.sum(self.localFlow)
         
         # The self.localFlow is a lrud vector of the flow components. There are two zeros, in the direction where the flow points away from.
-        weightedProbs = np.divide(walkerMultiplier*self.initProbs+flowSpeedMultiplier*self.localFlow, normalization)
+        weightedProbs = np.divide(1*self.initProbs+alpha*self.localFlow, 1*normalization)
         weightedCumProbs = np.cumsum(weightedProbs)
-        self.probdistance += 1/normalization
+        self.probdistance += 1/(normalization)
         
         # This function chooses a direction based on the probabilities. The outer makes it respect the specified grid size.
         direction = self.directionToStep(chooseDirection(weightedCumProbs)) #This is a coordinate, unit direction.

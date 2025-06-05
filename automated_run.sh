@@ -9,20 +9,16 @@
 # For >2017: offset = 360
 
 ndays=500
-dx=0.1
-dy=0.1
-dt=0.01
-nperday=5
-offset=0
-
 dx=0.04
 dy=0.04
 dt=0.025
+nperday=5
+offset=360
 
 
 ### 2016
-# year=2016
-# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+year=2016
+python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 # year=2018
 # python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 # year=2019
@@ -31,8 +27,8 @@ dt=0.025
 # python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 # year=2021
 # python "discrete_model/RWinVF-${year}.py" $ndays $nperday
-year=2022
-python "discrete_model/RWinVF-${year}.py" $ndays $nperday
+# year=2022
+# python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 # year=2023
 # python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 
@@ -40,7 +36,7 @@ python "discrete_model/RWinVF-${year}.py" $ndays $nperday
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
 
-# python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 both &
+#python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 both
 # python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 both &
 # python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 both &
 # python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 rw &

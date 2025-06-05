@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binomtest, chi2
 
-year=2018
+year=2023
 exceedsTop, exceedsBottom = load_data('discrete', f'{year}', f'{500}', f'{5}perday', 'exceedTopBottom')
 print(f'{year} Survival Ratio: ', exceedsBottom / (exceedsTop+exceedsBottom))
 

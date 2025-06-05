@@ -151,12 +151,15 @@ def update(frame):
 print("Starting combined animation...")
 ani = animation.FuncAnimation(fig, update, frames=max_steps, interval=1000 / fps, blit=True)
 writer = FFMpegWriter(fps=fps)
+print(mode)
 if mode == 'both':
     ani.save(f'videos/combined/{output_filename}', writer=writer)
+    print("Animation saved:", output_filename)
 if mode == 'rw':
     ani.save(f'videos/rw/{output_filename}', writer=writer)
+    print("Animation saved:", output_filename)
 if mode == 'pde':
     ani.save(f'videos/pde/{output_filename}', writer=writer)
+    print("Animation saved:", output_filename)
 
 plt.close()
-print("Animation saved:", output_filename)
