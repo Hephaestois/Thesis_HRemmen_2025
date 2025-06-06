@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'l
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '')))
 from library.functions import load_data, zipCoords
-
+print(sys.argv)
 # === Argument Parsing ===
 if len(sys.argv) != 10:
     print("Usage: python single_day_plot.py <year> <ndays> <dx> <dy> <dt> <nperday> <offset> <frame> <mode>")
