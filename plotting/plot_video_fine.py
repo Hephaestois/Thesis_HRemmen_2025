@@ -15,7 +15,7 @@ from library.functions import load_data, progressBar, zipCoords
 import time
 
 # Handle arguments
-if len(sys.argv) != 9:
+if len(sys.argv) != 8:
     print("Usage: python combined_plot_video.py <year> <ndays> <dx> <dy> <dt> <nperday> <offset> <mode>")
     sys.exit(1)
 
@@ -139,7 +139,7 @@ def update(frame):
 
             artists.extend([dots[i], crosses[i], starts[i]])
 
-    ax.set_title(f"{year}, Day {frame}", fontsize=title_fontsize)
+    ax.set_title(f"Year {year}, day {frame}", fontsize=title_fontsize)
     ax.set_xlabel("Longitude ($\degree$E)", fontsize=label_fontsize)
     ax.set_ylabel("Latitude ($\degree$N)", fontsize=label_fontsize)
     ax.tick_params(labelsize=tick_fontsize)
@@ -151,7 +151,6 @@ def update(frame):
 print("Starting combined animation...")
 ani = animation.FuncAnimation(fig, update, frames=max_steps, interval=1000 / fps, blit=True)
 writer = FFMpegWriter(fps=fps)
-print(mode)
 if mode == 'both':
     ani.save(f'videos/combined/{output_filename}', writer=writer)
     print("Animation saved:", output_filename)

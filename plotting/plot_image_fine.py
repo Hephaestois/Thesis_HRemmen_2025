@@ -101,7 +101,7 @@ if mode in {"rw", "both"}:
     ax.plot(offset - 25, 44.5, 'ro')
 
 # === Final touches ===
-ax.set_title(f"{year}, Day {frame}", fontsize=title_fontsize)
+ax.set_title(f"Year {year}, day {frame}", fontsize=title_fontsize)
 ax.set_xlabel("Longitude ($\degree$E)", fontsize=label_fontsize)
 ax.set_ylabel("Latitude ($\degree$N)", fontsize=label_fontsize)
 ax.tick_params(labelsize=tick_fontsize)

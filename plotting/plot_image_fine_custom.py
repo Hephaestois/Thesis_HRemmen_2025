@@ -34,16 +34,17 @@ walk_opacity = 10/frame  # Opacity of path lines
 density_resolution = f'{dx}x{dy}_{dt}'
 matrix_cutoff = 0.001
 vmin, vmax = 0, 2
+title = "Only constant terms, day 100"
 
 # === Load data ===
-metadata = load_data("pde_onlyConstant", year, days, density_resolution, 'metadata')
+metadata = load_data("pde_onlyDiffusion", year, days, density_resolution, 'metadata')
 paths, start_frames = load_data('discrete_onlyConstant', year, days, f'{walk_nperday}perday', 'allpositions')
 processed_paths = [zipCoords(path) for path in paths]
-filename = "figures/special/pde_onlyConstant.png"
+filename = "figures/special/rw_onlyConstant.png"
 
 
 # === Load matrix for the specific frame ===
-matrix = load_data("pde_onlyConstant", year, days, density_resolution, frame)[0]
+matrix = load_data("pde_onlyDiffusion", year, days, density_resolution, frame)[0]
 y_min_display = 42.5
 y_max_display = 46.5
 label_fontsize = 12
@@ -102,10 +103,10 @@ if mode in {"rw", "both"}:
         ax.plot(offset - 25, 44.5, 'ko')  # origin
 
     # Fixed red marker
-    ax.plot(offset - 25.25, 44.75, 'ro')
+    ax.plot(offset - 25, 44.5, 'ro')
 
 # === Final touches ===
-ax.set_title(f"{year}, Day {frame}", fontsize=title_fontsize)
+ax.set_title(title, fontsize=title_fontsize)
 ax.set_xlabel("Longitude ($\degree$E)", fontsize=label_fontsize)
 ax.set_ylabel("Latitude ($\degree$N)", fontsize=label_fontsize)
 ax.tick_params(labelsize=tick_fontsize)
