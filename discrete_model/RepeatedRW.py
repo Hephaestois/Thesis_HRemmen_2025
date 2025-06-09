@@ -15,15 +15,21 @@ import time
 # Swapping to Numpy, the performance (1M: 7.9s, 2M: 13.7s)
 # Actually properly vectorizing some stuff:
 #                                    (1M: 1.2s, 2M: 2.3s, 4M: 4.6s) Optimization acquired!
-
+label_fontsize = 12
+tick_fontsize = 12
 
 start = time.time()
 
 plt.figure()
 
 for i in range(500):
-    walker = Walker(weight_self=1, weight_VF=0)
+    walker = Walker(init_position=(-25, 44.5), verticalStepSize=0.02, horizontalStepSize=0.02)
     plt.plot(*zipCoords(walker.positionJumpProcess(1000)), alpha=0.01, color='red')
+plt.tight_layout() 
+plt.plot(-25, 44.5, color="k", marker='.')
+plt.xlabel("Longitude ($\degree$E)", fontsize=label_fontsize)
+plt.ylabel("Latitude ($\degree$N)", fontsize=label_fontsize)
+plt.tick_params(labelsize=tick_fontsize)
 
 plt.axis('equal')
 plt.axis('square')

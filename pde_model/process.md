@@ -167,11 +167,12 @@ I started by creating FVM2024.py, and immediately got a big good result: the dis
 
 Vader & Moeder
 Frey
+Viktoria!
 Sol & Yoshi van der Eng (TBD)
 Familie & familie van Frey (TBD who exactly)
+Em & Kaj
 Sam Mooney & Anne Mooney (TBD)
 Taico Aerts
-Uni vrienden & Middelbare school vrienden (TBD who exactly)
 
-Supervisors: Havva & Jeroen
+Beoordelaars: Havva & Jeroen
 

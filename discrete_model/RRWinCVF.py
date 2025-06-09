@@ -16,16 +16,22 @@ import netCDF4
 
 ### Simulation options
 # High level stuff
-N_swims = 100
-swim_length = 300
-startpos = np.array([-25.6, 44.4])
-walk_opacity = 0.01
+# N_swims = 200
+# swim_length = 1000
+# startpos = np.array([-25, 44.5])
+# walk_opacity = 0.0066
+
+N_swims = 200
+swim_length = 100
+startpos = np.array([-25, 44.5])
+walk_opacity = 0.0066
 
 ### Options
 longitude_data_stepsize = 1 #Multiples of 0.04 degree
 latitude_data_stepsize  = 1 #Multiples of 0.08 degree
 delta = 0
-simulationTimeIndex = 131496 #Moment at which this simulation is ran. This is time CONSTANT vector field.
+simulationTimeIndex = 133893 #Moment at which this simulation is ran. This is time CONSTANT vector field.
+
 
 ### END options
 
@@ -63,14 +69,19 @@ for i in range(N_swims):
     progressBar(i, N_swims-1, start)
     Tutel = Walker(
         init_position=startpos,
-        init_probs=(0.25,0.25,0.25,0.25),
-        #init_probs=(0.174468, 0.28168, 0.09942134, 0.4444274),
+        #init_probs=(0.25,0.25,0.25,0.25),
+        init_probs=(0.174468, 0.28168, 0.09942134, 0.4444274),
         horizontalStepSize=0.02, 
         verticalStepSize=0.02
         )
     locations = []
+    
     for _ in range(swim_length):
-        locations.append(Tutel.traverseVF(vectorfield, 1))
+        Tutel.probdistance = 0
+        while Tutel.probdistance < 1:
+            locations.append(Tutel.traverseVF(vectorfield, 1))
+        
+        
         
     plotvals = zipCoords(locations)
     points.append([plotvals[0][-1], plotvals[1][-1]])
@@ -80,6 +91,9 @@ for i in range(N_swims):
     
     for j in range(len(plotvals[0])-1):
         plt.plot(plotvals[0][j:j+2], plotvals[1][j:j+2], color='red', alpha=walk_opacity)
+
+for point in points:
+    plt.plot(point[0][-1], point[1][-1], 'wo', markersize=4, markeredgecolor='black')
     
 #plt.scatter(zipCoords(points)[0], zipCoords(points)[1], color='g', marker='.')       
 plt.tight_layout() 

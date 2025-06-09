@@ -74,7 +74,6 @@ class Walker:
     
     def positionJumpProcess(self, n):
         # Precompute random directions for all steps
-        randomNumbers = np.random.rand(n)
         directions = np.array([self.directionToStep(chooseDirection(self.cumProbs)) for i in range(n)])
         
         # Calculate all positions in parallel
