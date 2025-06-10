@@ -32,8 +32,8 @@ nperday=2
 #python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
-year=2021
-python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+# year=2021
+# python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
 # year=2022
@@ -43,6 +43,19 @@ python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # year=2023
 # python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
+year=2016
+offset=0
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 both &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 both &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 both &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 rw &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 rw &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 rw &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 pde &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 pde &
+python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 pde
+
+
 
 
 wait
