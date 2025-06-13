@@ -25,14 +25,17 @@ nperday=2
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
 # year=2019
+# offset=360
 # python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
-# python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
+#python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
-# year=2020
-#python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
+year=2020
+offset=360
+python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
 # year=2021
+# offset=360
 # python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
 
@@ -43,17 +46,20 @@ nperday=2
 # year=2023
 # python "pde_model/FVM${year}.py" $ndays $dx $dy $dt
 # python plotting/plot_video_fine.py $year $ndays $dx $dy $dt $nperday $offset both
-year=2016
-offset=0
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 both &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 both &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 both &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 rw &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 rw &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 rw &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 100 pde &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 200 pde &
-python plotting/plot_image_fine.py $year $ndays $dx $dy $dt $nperday $offset 300 pde
+
+
+
+# year=2016
+# offset=0
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 100 both &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 200 both &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 300 both &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 100 rw &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 200 rw &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 300 rw &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 100 pde &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 200 pde &
+# python plotting/plot_image_fine_custom.py $year $ndays $dx $dy $dt $nperday $offset 300 pde
 
 
 

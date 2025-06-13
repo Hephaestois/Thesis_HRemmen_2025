@@ -15,8 +15,8 @@ from library.functions import load_data, progressBar, zipCoords
 import time
 
 # Handle arguments
-if len(sys.argv) != 8:
-    print("Usage: python combined_plot_video.py <year> <ndays> <dx> <dy> <dt> <nperday> <offset> <mode>")
+if len(sys.argv) != 9:
+    print("Usage: python plot_video_fine.py <year> <ndays> <dx> <dy> <dt> <nperday> <offset> <mode>")
     sys.exit(1)
 
 year = int(sys.argv[1])
@@ -63,7 +63,7 @@ path_lengths = [len(p[0]) for p in processed_paths]
 max_steps = max(start + len(p[0]) for p, start in zip(processed_paths, start_frames))
 
 # === Setup Figure ===
-fig, ax = plt.subplots(figsize=[10, 4], dpi=150)
+fig, ax = plt.subplots(figsize=[10, 2.7778], dpi=150)
 ax.set_xlim(offset-29, offset-11)
 ax.set_ylim(42, 47)
 
